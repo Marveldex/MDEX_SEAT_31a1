@@ -5,4 +5,10 @@ package com.nordicsemi.venusAlpha01a;
  */
 
 public class TEST {
+
+     private int testNum = 0;
+    
+
+
+
 }
