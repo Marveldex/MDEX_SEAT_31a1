@@ -30,6 +30,9 @@ package com.mdex.venusAlpha01a;
 *   re-connection 안정화...
 *   protocol 분석
 *
+*
+* test git
+*
 * */
 
 import android.app.Activity;
