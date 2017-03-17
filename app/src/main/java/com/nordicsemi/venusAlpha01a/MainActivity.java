@@ -83,6 +83,17 @@ import java.util.Map;
 import static android.R.id.list;
 import static android.os.SystemClock.elapsedRealtime;
 
+/**
+ *
+ * @brief this is main function for run this app
+ * @details show values of sence and save to CSV File
+ * @author Marveldex
+ * @date 2017-03-17
+ * @version 0.0.1
+ * @li list1
+ * @li list2
+ *
+ */
 
 
 

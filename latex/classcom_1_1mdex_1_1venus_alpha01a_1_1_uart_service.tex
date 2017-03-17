@@ -1,0 +1,312 @@
+\hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service}{}\section{com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service Class Reference}
+\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service}\index{com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service@{com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service}}
+Inheritance diagram for com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_1_1_local_binder}{Local\+Binder}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+I\+Binder \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_af26c2be1d82ba32fcb1f754cd0c9d0c5}{on\+Bind} (Intent intent)
+\item 
+boolean \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a029ce1ef24fc3904b888bd217f4b115e}{on\+Unbind} (Intent intent)
+\item 
+boolean \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ae30e283bbee81ca4f91aaa430b624c16}{initialize} ()
+\item 
+boolean \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ae8c6637fcc70c1784e6b9b1123d5cb36}{connect} (final String address)
+\item 
+void \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a74a3d79f13944b102c44ca20ebd5ebcf}{disconnect} ()
+\item 
+void \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ae7041fe20f64a554c2685cdc4c7d69b5}{close} ()
+\item 
+void \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ae686ffe62ae7f32165905349636ce676}{read\+Characteristic} (Bluetooth\+Gatt\+Characteristic characteristic)
+\item 
+void \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a18292c82804f4c2d4683cc5bda145076}{enable\+T\+X\+Notification} ()
+\item 
+void \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a5002d54ae63dfb028521375291acc644}{write\+R\+X\+Characteristic} (byte\mbox{[}$\,$\mbox{]} value)
+\item 
+List$<$ Bluetooth\+Gatt\+Service $>$ \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a8e61c0f9da4f1ad3f2f0d06ca9e09f26}{get\+Supported\+Gatt\+Services} ()
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static final String \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ac6fc749e56339e8b9d60f35733ccb3b2}{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+C\+O\+N\+N\+E\+C\+T\+ED}
+\item 
+static final String \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a27877d823f3ebe78f54d5d7cd3dd75c8}{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+D\+I\+S\+C\+O\+N\+N\+E\+C\+T\+ED}
+\item 
+static final String \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a81f26c05476d44bdbb3e90d18bd5fccc}{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+S\+E\+R\+V\+I\+C\+E\+S\+\_\+\+D\+I\+S\+C\+O\+V\+E\+R\+ED}
+\item 
+static final String \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a23780e50bdd9a59daa0647fffdc457fc}{A\+C\+T\+I\+O\+N\+\_\+\+D\+A\+T\+A\+\_\+\+A\+V\+A\+I\+L\+A\+B\+LE}
+\item 
+static final String \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a893d04451b771197abc5d99971933d9d}{E\+X\+T\+R\+A\+\_\+\+D\+A\+TA}
+\item 
+static final String \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a42a3ccdf849fdea2a227f4bfe6fbf06f}{D\+E\+V\+I\+C\+E\+\_\+\+D\+O\+E\+S\+\_\+\+N\+O\+T\+\_\+\+S\+U\+P\+P\+O\+R\+T\+\_\+\+U\+A\+RT}
+\item 
+static final U\+U\+ID \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a81732b1493c849122f7390b4ceb42180}{T\+X\+\_\+\+P\+O\+W\+E\+R\+\_\+\+U\+U\+ID} = U\+U\+I\+D.\+from\+String(\char`\"{}00001804-\/0000-\/1000-\/8000-\/00805f9b34fb\char`\"{})
+\item 
+static final U\+U\+ID \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a553fcb4c8cb6523b461f9f3e57b0bcb1}{T\+X\+\_\+\+P\+O\+W\+E\+R\+\_\+\+L\+E\+V\+E\+L\+\_\+\+U\+U\+ID} = U\+U\+I\+D.\+from\+String(\char`\"{}00002a07-\/0000-\/1000-\/8000-\/00805f9b34fb\char`\"{})
+\item 
+static final U\+U\+ID \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a30186c5d6a56d7f5e8a159a003187126}{C\+C\+CD} = U\+U\+I\+D.\+from\+String(\char`\"{}00002902-\/0000-\/1000-\/8000-\/00805f9b34fb\char`\"{})
+\item 
+static final U\+U\+ID \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a3d6136559cd5d641da1f6b46dae8933c}{F\+I\+R\+M\+W\+A\+R\+E\+\_\+\+R\+E\+V\+I\+S\+O\+N\+\_\+\+U\+U\+ID} = U\+U\+I\+D.\+from\+String(\char`\"{}00002a26-\/0000-\/1000-\/8000-\/00805f9b34fb\char`\"{})
+\item 
+static final U\+U\+ID \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ab301d030c2817448086edfdda58714db}{D\+I\+S\+\_\+\+U\+U\+ID} = U\+U\+I\+D.\+from\+String(\char`\"{}0000180a-\/0000-\/1000-\/8000-\/00805f9b34fb\char`\"{})
+\item 
+static final U\+U\+ID \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a7830194fa25ea190bc45196de3d2f597}{R\+X\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+U\+ID} = U\+U\+I\+D.\+from\+String(\char`\"{}6e400001-\/b5a3-\/f393-\/e0a9-\/e50e24dcca9e\char`\"{})
+\item 
+static final U\+U\+ID \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_adcb74025cea6a3cc0b6c4a362217f770}{R\+X\+\_\+\+C\+H\+A\+R\+\_\+\+U\+U\+ID} = U\+U\+I\+D.\+from\+String(\char`\"{}6e400002-\/b5a3-\/f393-\/e0a9-\/e50e24dcca9e\char`\"{})
+\item 
+static final U\+U\+ID \hyperlink{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_abfb7f0e89ef0bcb54c7c38091d3bb8ba}{T\+X\+\_\+\+C\+H\+A\+R\+\_\+\+U\+U\+ID} = U\+U\+I\+D.\+from\+String(\char`\"{}6e400003-\/b5a3-\/f393-\/e0a9-\/e50e24dcca9e\char`\"{})
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Service for managing connection and data communication with a G\+A\+TT server hosted on a given Bluetooth LE device. 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ae7041fe20f64a554c2685cdc4c7d69b5}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ae7041fe20f64a554c2685cdc4c7d69b5}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!close@{close}}
+\index{close@{close}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{close()}{close()}}
+{\footnotesize\ttfamily void com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+close (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+After using a given B\+LE device, the app must call this method to ensure resources are released properly. \mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ae8c6637fcc70c1784e6b9b1123d5cb36}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ae8c6637fcc70c1784e6b9b1123d5cb36}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!connect@{connect}}
+\index{connect@{connect}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{connect()}{connect()}}
+{\footnotesize\ttfamily boolean com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+connect (\begin{DoxyParamCaption}\item[{final String}]{address }\end{DoxyParamCaption})}
+
+Connects to the G\+A\+TT server hosted on the Bluetooth LE device.
+
+
+\begin{DoxyParams}{Parameters}
+{\em address} & The device address of the destination device.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Return true if the connection is initiated successfully. The connection result is reported asynchronously through the 
+\begin{DoxyCode}
+BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, \textcolor{keywordtype}{int}, \textcolor{keywordtype}{int}) 
+\end{DoxyCode}
+ callback. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a74a3d79f13944b102c44ca20ebd5ebcf}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a74a3d79f13944b102c44ca20ebd5ebcf}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!disconnect@{disconnect}}
+\index{disconnect@{disconnect}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{disconnect()}{disconnect()}}
+{\footnotesize\ttfamily void com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+disconnect (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Disconnects an existing connection or cancel a pending connection. The disconnection result is reported asynchronously through the 
+\begin{DoxyCode}
+BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, \textcolor{keywordtype}{int}, \textcolor{keywordtype}{int}) 
+\end{DoxyCode}
+ callback. \mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a18292c82804f4c2d4683cc5bda145076}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a18292c82804f4c2d4683cc5bda145076}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!enable\+T\+X\+Notification@{enable\+T\+X\+Notification}}
+\index{enable\+T\+X\+Notification@{enable\+T\+X\+Notification}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{enable\+T\+X\+Notification()}{enableTXNotification()}}
+{\footnotesize\ttfamily void com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+enable\+T\+X\+Notification (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Enables or disables notification on a give characteristic. Enable Notification on TX characteristic
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a8e61c0f9da4f1ad3f2f0d06ca9e09f26}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a8e61c0f9da4f1ad3f2f0d06ca9e09f26}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!get\+Supported\+Gatt\+Services@{get\+Supported\+Gatt\+Services}}
+\index{get\+Supported\+Gatt\+Services@{get\+Supported\+Gatt\+Services}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{get\+Supported\+Gatt\+Services()}{getSupportedGattServices()}}
+{\footnotesize\ttfamily List$<$Bluetooth\+Gatt\+Service$>$ com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+get\+Supported\+Gatt\+Services (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Retrieves a list of supported G\+A\+TT services on the connected device. This should be invoked only after
+\begin{DoxyCode}
+BluetoothGatt#discoverServices() 
+\end{DoxyCode}
+ completes successfully.
+
+\begin{DoxyReturn}{Returns}
+A
+\begin{DoxyCode}
+List 
+\end{DoxyCode}
+ of supported services. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ae30e283bbee81ca4f91aaa430b624c16}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ae30e283bbee81ca4f91aaa430b624c16}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!initialize@{initialize}}
+\index{initialize@{initialize}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily boolean com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+initialize (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Initializes a reference to the local Bluetooth adapter.
+
+\begin{DoxyReturn}{Returns}
+Return true if the initialization is successful. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_af26c2be1d82ba32fcb1f754cd0c9d0c5}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_af26c2be1d82ba32fcb1f754cd0c9d0c5}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!on\+Bind@{on\+Bind}}
+\index{on\+Bind@{on\+Bind}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{on\+Bind()}{onBind()}}
+{\footnotesize\ttfamily I\+Binder com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+on\+Bind (\begin{DoxyParamCaption}\item[{Intent}]{intent }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a029ce1ef24fc3904b888bd217f4b115e}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a029ce1ef24fc3904b888bd217f4b115e}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!on\+Unbind@{on\+Unbind}}
+\index{on\+Unbind@{on\+Unbind}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{on\+Unbind()}{onUnbind()}}
+{\footnotesize\ttfamily boolean com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+on\+Unbind (\begin{DoxyParamCaption}\item[{Intent}]{intent }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ae686ffe62ae7f32165905349636ce676}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ae686ffe62ae7f32165905349636ce676}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!read\+Characteristic@{read\+Characteristic}}
+\index{read\+Characteristic@{read\+Characteristic}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{read\+Characteristic()}{readCharacteristic()}}
+{\footnotesize\ttfamily void com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+read\+Characteristic (\begin{DoxyParamCaption}\item[{Bluetooth\+Gatt\+Characteristic}]{characteristic }\end{DoxyParamCaption})}
+
+Request a read on a given
+\begin{DoxyCode}
+BluetoothGattCharacteristic 
+\end{DoxyCode}
+ . The read result is reported asynchronously through the
+\begin{DoxyCode}
+BluetoothGattCallback#onCharacteristicRead(android.bluetooth.BluetoothGatt, android.bluetooth.
+      BluetoothGattCharacteristic, \textcolor{keywordtype}{int}) 
+\end{DoxyCode}
+ callback.
+
+
+\begin{DoxyParams}{Parameters}
+{\em characteristic} & The characteristic to read from. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a5002d54ae63dfb028521375291acc644}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a5002d54ae63dfb028521375291acc644}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!write\+R\+X\+Characteristic@{write\+R\+X\+Characteristic}}
+\index{write\+R\+X\+Characteristic@{write\+R\+X\+Characteristic}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{write\+R\+X\+Characteristic()}{writeRXCharacteristic()}}
+{\footnotesize\ttfamily void com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+write\+R\+X\+Characteristic (\begin{DoxyParamCaption}\item[{byte \mbox{[}$\,$\mbox{]}}]{value }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a23780e50bdd9a59daa0647fffdc457fc}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a23780e50bdd9a59daa0647fffdc457fc}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!A\+C\+T\+I\+O\+N\+\_\+\+D\+A\+T\+A\+\_\+\+A\+V\+A\+I\+L\+A\+B\+LE@{A\+C\+T\+I\+O\+N\+\_\+\+D\+A\+T\+A\+\_\+\+A\+V\+A\+I\+L\+A\+B\+LE}}
+\index{A\+C\+T\+I\+O\+N\+\_\+\+D\+A\+T\+A\+\_\+\+A\+V\+A\+I\+L\+A\+B\+LE@{A\+C\+T\+I\+O\+N\+\_\+\+D\+A\+T\+A\+\_\+\+A\+V\+A\+I\+L\+A\+B\+LE}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{A\+C\+T\+I\+O\+N\+\_\+\+D\+A\+T\+A\+\_\+\+A\+V\+A\+I\+L\+A\+B\+LE}{ACTION\_DATA\_AVAILABLE}}
+{\footnotesize\ttfamily final String com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+A\+C\+T\+I\+O\+N\+\_\+\+D\+A\+T\+A\+\_\+\+A\+V\+A\+I\+L\+A\+B\+LE\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+=
+            \textcolor{stringliteral}{"com.nordicsemi.nrfUART.ACTION\_DATA\_AVAILABLE"}
+\end{DoxyCode}
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ac6fc749e56339e8b9d60f35733ccb3b2}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ac6fc749e56339e8b9d60f35733ccb3b2}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+C\+O\+N\+N\+E\+C\+T\+ED@{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+C\+O\+N\+N\+E\+C\+T\+ED}}
+\index{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+C\+O\+N\+N\+E\+C\+T\+ED@{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+C\+O\+N\+N\+E\+C\+T\+ED}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+C\+O\+N\+N\+E\+C\+T\+ED}{ACTION\_GATT\_CONNECTED}}
+{\footnotesize\ttfamily final String com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+C\+O\+N\+N\+E\+C\+T\+ED\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+=
+            \textcolor{stringliteral}{"com.nordicsemi.nrfUART.ACTION\_GATT\_CONNECTED"}
+\end{DoxyCode}
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a27877d823f3ebe78f54d5d7cd3dd75c8}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a27877d823f3ebe78f54d5d7cd3dd75c8}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+D\+I\+S\+C\+O\+N\+N\+E\+C\+T\+ED@{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+D\+I\+S\+C\+O\+N\+N\+E\+C\+T\+ED}}
+\index{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+D\+I\+S\+C\+O\+N\+N\+E\+C\+T\+ED@{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+D\+I\+S\+C\+O\+N\+N\+E\+C\+T\+ED}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+D\+I\+S\+C\+O\+N\+N\+E\+C\+T\+ED}{ACTION\_GATT\_DISCONNECTED}}
+{\footnotesize\ttfamily final String com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+D\+I\+S\+C\+O\+N\+N\+E\+C\+T\+ED\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+=
+            \textcolor{stringliteral}{"com.nordicsemi.nrfUART.ACTION\_GATT\_DISCONNECTED"}
+\end{DoxyCode}
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a81f26c05476d44bdbb3e90d18bd5fccc}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a81f26c05476d44bdbb3e90d18bd5fccc}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+S\+E\+R\+V\+I\+C\+E\+S\+\_\+\+D\+I\+S\+C\+O\+V\+E\+R\+ED@{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+S\+E\+R\+V\+I\+C\+E\+S\+\_\+\+D\+I\+S\+C\+O\+V\+E\+R\+ED}}
+\index{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+S\+E\+R\+V\+I\+C\+E\+S\+\_\+\+D\+I\+S\+C\+O\+V\+E\+R\+ED@{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+S\+E\+R\+V\+I\+C\+E\+S\+\_\+\+D\+I\+S\+C\+O\+V\+E\+R\+ED}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+S\+E\+R\+V\+I\+C\+E\+S\+\_\+\+D\+I\+S\+C\+O\+V\+E\+R\+ED}{ACTION\_GATT\_SERVICES\_DISCOVERED}}
+{\footnotesize\ttfamily final String com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+A\+C\+T\+I\+O\+N\+\_\+\+G\+A\+T\+T\+\_\+\+S\+E\+R\+V\+I\+C\+E\+S\+\_\+\+D\+I\+S\+C\+O\+V\+E\+R\+ED\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+=
+            \textcolor{stringliteral}{"com.nordicsemi.nrfUART.ACTION\_GATT\_SERVICES\_DISCOVERED"}
+\end{DoxyCode}
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a30186c5d6a56d7f5e8a159a003187126}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a30186c5d6a56d7f5e8a159a003187126}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!C\+C\+CD@{C\+C\+CD}}
+\index{C\+C\+CD@{C\+C\+CD}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{C\+C\+CD}{CCCD}}
+{\footnotesize\ttfamily final U\+U\+ID com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+C\+C\+CD = U\+U\+I\+D.\+from\+String(\char`\"{}00002902-\/0000-\/1000-\/8000-\/00805f9b34fb\char`\"{})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a42a3ccdf849fdea2a227f4bfe6fbf06f}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a42a3ccdf849fdea2a227f4bfe6fbf06f}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!D\+E\+V\+I\+C\+E\+\_\+\+D\+O\+E\+S\+\_\+\+N\+O\+T\+\_\+\+S\+U\+P\+P\+O\+R\+T\+\_\+\+U\+A\+RT@{D\+E\+V\+I\+C\+E\+\_\+\+D\+O\+E\+S\+\_\+\+N\+O\+T\+\_\+\+S\+U\+P\+P\+O\+R\+T\+\_\+\+U\+A\+RT}}
+\index{D\+E\+V\+I\+C\+E\+\_\+\+D\+O\+E\+S\+\_\+\+N\+O\+T\+\_\+\+S\+U\+P\+P\+O\+R\+T\+\_\+\+U\+A\+RT@{D\+E\+V\+I\+C\+E\+\_\+\+D\+O\+E\+S\+\_\+\+N\+O\+T\+\_\+\+S\+U\+P\+P\+O\+R\+T\+\_\+\+U\+A\+RT}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{D\+E\+V\+I\+C\+E\+\_\+\+D\+O\+E\+S\+\_\+\+N\+O\+T\+\_\+\+S\+U\+P\+P\+O\+R\+T\+\_\+\+U\+A\+RT}{DEVICE\_DOES\_NOT\_SUPPORT\_UART}}
+{\footnotesize\ttfamily final String com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+D\+E\+V\+I\+C\+E\+\_\+\+D\+O\+E\+S\+\_\+\+N\+O\+T\+\_\+\+S\+U\+P\+P\+O\+R\+T\+\_\+\+U\+A\+RT\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+=
+            \textcolor{stringliteral}{"com.nordicsemi.nrfUART.DEVICE\_DOES\_NOT\_SUPPORT\_UART"}
+\end{DoxyCode}
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ab301d030c2817448086edfdda58714db}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_ab301d030c2817448086edfdda58714db}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!D\+I\+S\+\_\+\+U\+U\+ID@{D\+I\+S\+\_\+\+U\+U\+ID}}
+\index{D\+I\+S\+\_\+\+U\+U\+ID@{D\+I\+S\+\_\+\+U\+U\+ID}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{D\+I\+S\+\_\+\+U\+U\+ID}{DIS\_UUID}}
+{\footnotesize\ttfamily final U\+U\+ID com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+D\+I\+S\+\_\+\+U\+U\+ID = U\+U\+I\+D.\+from\+String(\char`\"{}0000180a-\/0000-\/1000-\/8000-\/00805f9b34fb\char`\"{})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a893d04451b771197abc5d99971933d9d}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a893d04451b771197abc5d99971933d9d}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!E\+X\+T\+R\+A\+\_\+\+D\+A\+TA@{E\+X\+T\+R\+A\+\_\+\+D\+A\+TA}}
+\index{E\+X\+T\+R\+A\+\_\+\+D\+A\+TA@{E\+X\+T\+R\+A\+\_\+\+D\+A\+TA}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{E\+X\+T\+R\+A\+\_\+\+D\+A\+TA}{EXTRA\_DATA}}
+{\footnotesize\ttfamily final String com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+E\+X\+T\+R\+A\+\_\+\+D\+A\+TA\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+=
+            \textcolor{stringliteral}{"com.nordicsemi.nrfUART.EXTRA\_DATA"}
+\end{DoxyCode}
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a3d6136559cd5d641da1f6b46dae8933c}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a3d6136559cd5d641da1f6b46dae8933c}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!F\+I\+R\+M\+W\+A\+R\+E\+\_\+\+R\+E\+V\+I\+S\+O\+N\+\_\+\+U\+U\+ID@{F\+I\+R\+M\+W\+A\+R\+E\+\_\+\+R\+E\+V\+I\+S\+O\+N\+\_\+\+U\+U\+ID}}
+\index{F\+I\+R\+M\+W\+A\+R\+E\+\_\+\+R\+E\+V\+I\+S\+O\+N\+\_\+\+U\+U\+ID@{F\+I\+R\+M\+W\+A\+R\+E\+\_\+\+R\+E\+V\+I\+S\+O\+N\+\_\+\+U\+U\+ID}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{F\+I\+R\+M\+W\+A\+R\+E\+\_\+\+R\+E\+V\+I\+S\+O\+N\+\_\+\+U\+U\+ID}{FIRMWARE\_REVISON\_UUID}}
+{\footnotesize\ttfamily final U\+U\+ID com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+F\+I\+R\+M\+W\+A\+R\+E\+\_\+\+R\+E\+V\+I\+S\+O\+N\+\_\+\+U\+U\+ID = U\+U\+I\+D.\+from\+String(\char`\"{}00002a26-\/0000-\/1000-\/8000-\/00805f9b34fb\char`\"{})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_adcb74025cea6a3cc0b6c4a362217f770}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_adcb74025cea6a3cc0b6c4a362217f770}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!R\+X\+\_\+\+C\+H\+A\+R\+\_\+\+U\+U\+ID@{R\+X\+\_\+\+C\+H\+A\+R\+\_\+\+U\+U\+ID}}
+\index{R\+X\+\_\+\+C\+H\+A\+R\+\_\+\+U\+U\+ID@{R\+X\+\_\+\+C\+H\+A\+R\+\_\+\+U\+U\+ID}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{R\+X\+\_\+\+C\+H\+A\+R\+\_\+\+U\+U\+ID}{RX\_CHAR\_UUID}}
+{\footnotesize\ttfamily final U\+U\+ID com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+R\+X\+\_\+\+C\+H\+A\+R\+\_\+\+U\+U\+ID = U\+U\+I\+D.\+from\+String(\char`\"{}6e400002-\/b5a3-\/f393-\/e0a9-\/e50e24dcca9e\char`\"{})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a7830194fa25ea190bc45196de3d2f597}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a7830194fa25ea190bc45196de3d2f597}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!R\+X\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+U\+ID@{R\+X\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+U\+ID}}
+\index{R\+X\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+U\+ID@{R\+X\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+U\+ID}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{R\+X\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+U\+ID}{RX\_SERVICE\_UUID}}
+{\footnotesize\ttfamily final U\+U\+ID com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+R\+X\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+U\+ID = U\+U\+I\+D.\+from\+String(\char`\"{}6e400001-\/b5a3-\/f393-\/e0a9-\/e50e24dcca9e\char`\"{})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_abfb7f0e89ef0bcb54c7c38091d3bb8ba}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_abfb7f0e89ef0bcb54c7c38091d3bb8ba}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!T\+X\+\_\+\+C\+H\+A\+R\+\_\+\+U\+U\+ID@{T\+X\+\_\+\+C\+H\+A\+R\+\_\+\+U\+U\+ID}}
+\index{T\+X\+\_\+\+C\+H\+A\+R\+\_\+\+U\+U\+ID@{T\+X\+\_\+\+C\+H\+A\+R\+\_\+\+U\+U\+ID}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{T\+X\+\_\+\+C\+H\+A\+R\+\_\+\+U\+U\+ID}{TX\_CHAR\_UUID}}
+{\footnotesize\ttfamily final U\+U\+ID com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+T\+X\+\_\+\+C\+H\+A\+R\+\_\+\+U\+U\+ID = U\+U\+I\+D.\+from\+String(\char`\"{}6e400003-\/b5a3-\/f393-\/e0a9-\/e50e24dcca9e\char`\"{})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a553fcb4c8cb6523b461f9f3e57b0bcb1}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a553fcb4c8cb6523b461f9f3e57b0bcb1}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!T\+X\+\_\+\+P\+O\+W\+E\+R\+\_\+\+L\+E\+V\+E\+L\+\_\+\+U\+U\+ID@{T\+X\+\_\+\+P\+O\+W\+E\+R\+\_\+\+L\+E\+V\+E\+L\+\_\+\+U\+U\+ID}}
+\index{T\+X\+\_\+\+P\+O\+W\+E\+R\+\_\+\+L\+E\+V\+E\+L\+\_\+\+U\+U\+ID@{T\+X\+\_\+\+P\+O\+W\+E\+R\+\_\+\+L\+E\+V\+E\+L\+\_\+\+U\+U\+ID}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{T\+X\+\_\+\+P\+O\+W\+E\+R\+\_\+\+L\+E\+V\+E\+L\+\_\+\+U\+U\+ID}{TX\_POWER\_LEVEL\_UUID}}
+{\footnotesize\ttfamily final U\+U\+ID com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+T\+X\+\_\+\+P\+O\+W\+E\+R\+\_\+\+L\+E\+V\+E\+L\+\_\+\+U\+U\+ID = U\+U\+I\+D.\+from\+String(\char`\"{}00002a07-\/0000-\/1000-\/8000-\/00805f9b34fb\char`\"{})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a81732b1493c849122f7390b4ceb42180}\label{classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service_a81732b1493c849122f7390b4ceb42180}} 
+\index{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}!T\+X\+\_\+\+P\+O\+W\+E\+R\+\_\+\+U\+U\+ID@{T\+X\+\_\+\+P\+O\+W\+E\+R\+\_\+\+U\+U\+ID}}
+\index{T\+X\+\_\+\+P\+O\+W\+E\+R\+\_\+\+U\+U\+ID@{T\+X\+\_\+\+P\+O\+W\+E\+R\+\_\+\+U\+U\+ID}!com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service@{com\+::mdex\+::venus\+Alpha01a\+::\+Uart\+Service}}
+\subsubsection{\texorpdfstring{T\+X\+\_\+\+P\+O\+W\+E\+R\+\_\+\+U\+U\+ID}{TX\_POWER\_UUID}}
+{\footnotesize\ttfamily final U\+U\+ID com.\+mdex.\+venus\+Alpha01a.\+Uart\+Service.\+T\+X\+\_\+\+P\+O\+W\+E\+R\+\_\+\+U\+U\+ID = U\+U\+I\+D.\+from\+String(\char`\"{}00001804-\/0000-\/1000-\/8000-\/00805f9b34fb\char`\"{})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+app/src/main/java/com/nordicsemi/venus\+Alpha01a/\hyperlink{_uart_service_8java}{Uart\+Service.\+java}\end{DoxyCompactItemize}
