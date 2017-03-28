@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['writerxcharacteristic',['writeRXCharacteristic',['../classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service.html#a5002d54ae63dfb028521375291acc644',1,'com::mdex::venusAlpha01a::UartService']]]
+  ['uartservice',['UartService',['../classcom_1_1mdex_1_1venus_alpha01a_1_1_uart_service.html',1,'com::mdex::venusAlpha01a']]],
+  ['uartservice_2ejava',['UartService.java',['../_uart_service_8java.html',1,'']]]
 ];

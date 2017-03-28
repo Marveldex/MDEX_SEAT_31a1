@@ -60,6 +60,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ *
+ * @details 연결 할  블루투스 장치를 관리하는 class
+ * @author Marveldex
+ * @date 2017-03-17
+ * @version 0.0.1
+ * @li list1
+ * @li list2
+ *
+ */
+
 public class DeviceListActivity extends Activity {
     private BluetoothAdapter mBluetoothAdapter;
 
@@ -121,6 +132,14 @@ public class DeviceListActivity extends Activity {
 
     }
 
+    /**
+     *
+     * @brief 연결할 장비 리스트를 관리하는 함수
+     * @details 연결 할 장비의 ArrayList, adapter, hashmap를 생성하고  연결 가능한 블루투스 디바이스의 정보를 가져와 ListView에 Setting한다.
+     * @param
+     * @return
+     * @throws
+     */
     private void populateList() {
         /* Initialize device list container */
         Log.d(TAG, "populateList");
@@ -135,7 +154,15 @@ public class DeviceListActivity extends Activity {
            scanLeDevice(true);
 
     }
-    
+
+    /**
+     *
+     * @brief 블루투스 디바이스를 스켄한다.
+     * @details 구분자를 통해 블루투스의 장치 scan의 여부를 판단하고 블루투스 장치를 스캔하거나 스켄을 중단한다. 해당 구분자를 통해 장치 List화면에서 Button의 Text값을 변경해준다.
+     * @param
+     * @return
+     * @throws
+     */
     private void scanLeDevice(final boolean enable) {
         final Button cancelButton = (Button) findViewById(R.id.btn_cancel);
         if (enable) {
@@ -162,6 +189,14 @@ public class DeviceListActivity extends Activity {
 
     }
 
+    /**
+     *
+     * @brief 디바이스 정보를 Setting 하는 Adapter
+     * @details
+     * @param
+     * @return
+     * @throws
+     */
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
 
@@ -176,7 +211,15 @@ public class DeviceListActivity extends Activity {
             });
         }
     };
-    
+
+    /**
+     *
+     * @brief BluetoothAdapter.LeScanCallback 에서 호출되는 함수
+     * @details List의 블루투스 장치들의 Mac? 주소를 통해 장치를 찾고 해당 디바이스의 정보를 함수에 저장
+     * @param
+     * @return
+     * @throws
+     */
     private void addDevice(BluetoothDevice device, int rssi) {
         boolean deviceFound = false;
 
@@ -223,6 +266,15 @@ public class DeviceListActivity extends Activity {
         
     }
 
+
+    /**
+     *
+     * @brief    블루투스 리스트에서 장비를 선택했을 시 동작하는 함수
+     * @details 선택된 디바이스 정보를 Setting
+     * @param
+     * @return
+     * @throws
+     */
     private OnItemClickListener mDeviceClickListener = new OnItemClickListener() {
     	
         @Override
@@ -247,7 +299,19 @@ public class DeviceListActivity extends Activity {
         super.onPause();
         scanLeDevice(false);
     }
-    
+
+
+    /**
+     *
+     * @details
+     * @author Marveldex
+     * @date 2017-03-17
+     * @version 0.0.1
+     * @li list1
+     * @li list2
+     *
+     */
+
     class DeviceAdapter extends BaseAdapter {
         Context context;
         List<BluetoothDevice> devices;

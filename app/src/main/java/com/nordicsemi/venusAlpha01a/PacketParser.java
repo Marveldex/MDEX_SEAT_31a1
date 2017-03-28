@@ -6,6 +6,18 @@ import android.graphics.Rect;
  * Created by sehjin12-pc on 2016-12-11.
  */
 
+
+/**
+ *
+ * @details 압력세서로부터 전달 받은 데이터를 처리하여 직관적인 값으로 변환하고 사용할 변수에 Setting
+ * @author Marveldex
+ * @date 2017-03-17
+ * @version 0.0.1
+ * @li list1
+ * @li list2
+ *
+ */
+
 public class PacketParser {
     public static byte m_BatteryLevel = 0;
     public static byte def_CELL_COUNT_ROW0 = 6;
@@ -43,6 +55,14 @@ public class PacketParser {
         return 0;
     }
 
+    /**
+     *
+     * @brief    전달 받은 압력 값을 구분하고 해당 값들을 변수에 Setting
+     * @details
+     * @param
+     * @return
+     * @throws
+     */
 
     public void ParseOnePacket(byte [] packet_raw_data){
         for(int index = 0 ; index < 20 ; index++){
@@ -139,6 +159,15 @@ public class PacketParser {
         return false;
     }
 
+
+    /**
+     *
+     * @brief
+     * @details
+     * @param
+     * @return
+     * @throws
+     */
 
     public static float getCOM_x_Row1(){
         //  calculate COM - lateral
