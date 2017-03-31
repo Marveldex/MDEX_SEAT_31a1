@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['android_2dnrf_2duart',['Android-nRF-UART',['../md__r_e_a_d_m_e.html',1,'']]]
+  ['scms_28_20sitting_20cushion_20management_20system_29_20_2d_20marveldex',['SCMS( Sitting Cushion Management System) - Marveldex',['../index.html',1,'']]]
 ];
