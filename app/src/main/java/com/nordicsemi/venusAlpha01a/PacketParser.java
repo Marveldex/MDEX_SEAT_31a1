@@ -62,22 +62,14 @@ public class PacketParser {
     /**
      *
      * @brief    전달 받은 압력 값을 구분하고 해당 값들을 변수에 Setting
-<<<<<<< HEAD
      * @details 1) Convert 8bit to 32bit, 2) Distinguish what if this packet is 'M' or 'S' and store to buffer 3) Reorder sensor sequence after last packet ('S') arrived.
-=======
-     * @details
->>>>>>> origin/master
      * @param
      * @return
      * @throws
      */
 
-<<<<<<< HEAD
     public void onReceiveRawPacket(byte [] packet_raw_data){
         //  1) Convert 8bit to 32bit
-=======
-    public void ParseOnePacket(byte [] packet_raw_data){
->>>>>>> origin/master
         for(int index = 0 ; index < 20 ; index++){
             packet_data_32bit[index] = packet_raw_data[index];// & 0xff;
         }
@@ -170,7 +162,6 @@ public class PacketParser {
 
     /**
      *
-<<<<<<< HEAD
      * @brief calculate lateral COM
      * @details
      * @param
@@ -180,46 +171,6 @@ public class PacketParser {
         int summation_mess = 0;
         float summation_mess_x_position = 0;
         float position;
-=======
-     * @brief
-     * @details
-     * @param
-     * @return
-     * @throws
-     */
-
-    public static float getCOM_x_Row1(){
-        //  calculate COM - lateral
-        int peak_value = 0;
-        int peak_position = 0;
-        int average_value = 0;
-        int summation_value = 0;
-        float level_pos = 0.0f;
-        int pressure_new = 0;
-
-        float position_weight = 0.0f; // 1.0f = pos of 1st dot, 0.0f = pos of 0th dot
-        {
-            for(int i = 0 ; i < def_CELL_COUNT_ROW1 ; i++) {
-                if(peak_value < nChairVal_Row1[i]) {
-                    peak_value = nChairVal_Row1[i];
-                    peak_position = i;
-                }
-
-                if(0 < i) {
-                    if( (nChairVal_Row1[i] == 0) && (summation_value == 0) ) {
-                    }
-                    else {
-                        level_pos = i;
-                        pressure_new = nChairVal_Row1[i];
-                        position_weight = position_weight + (level_pos - position_weight) * pressure_new / (pressure_new + summation_value);
-                    }
-                }
-
-                summation_value += nChairVal_Row1[i];
-
-            }
-            average_value = summation_value / def_CELL_COUNT_ROW1;
->>>>>>> origin/master
 
         for(int i = 0 ; i < def_CELL_COUNT_ROW1 ; i++) {
             position = (float)i;

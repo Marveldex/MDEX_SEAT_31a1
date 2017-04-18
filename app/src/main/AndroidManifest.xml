@@ -36,12 +36,12 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application 
-        android:label="@string/app_name"
+        android:label="MDEX-SEAT-31a0"
         android:theme="@android:style/Theme.Holo.Light"
-        android:icon="@drawable/nrfuart_hdpi_icon">
+        android:icon="@drawable/icon1">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
+            android:label="MDEX-SEAT-31a0"
             android:windowSoftInputMode="stateHidden"
             android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>

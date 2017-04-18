@@ -68,11 +68,8 @@ import android.widget.Toast;
  * @version 0.0.1
  * @li list1
  * @li list2
-<<<<<<< HEAD
  * @li list3
  * @li list4 asddxfsdfsdf
-=======
->>>>>>> origin/master
  *
  */
 
