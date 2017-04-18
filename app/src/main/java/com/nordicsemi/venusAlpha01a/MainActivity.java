@@ -23,18 +23,6 @@
 
 package com.mdex.venusAlpha01a;
 
-
-/*
-*   TODO
-*   send button
-*   re-connection 안정화...
-*   protocol 분석
-*
-*
-* test git
-*
-* */
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -47,17 +35,25 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -80,6 +76,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.R.id.icon1;
 import static android.R.id.list;
 import static android.os.SystemClock.elapsedRealtime;
 
@@ -118,31 +115,22 @@ import static android.os.SystemClock.elapsedRealtime;
 public class   MainActivity extends Activity implements RadioGroup.OnCheckedChangeListener {
     private static final int REQUEST_SELECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
-    private static final int UART_PROFILE_READY = 10;
+    //private static final int UART_PROFILE_READY = 10;
     public static final String TAG = "nRFUART";
     private static final int UART_PROFILE_CONNECTED = 20;
     private static final int UART_PROFILE_DISCONNECTED = 21;
-    private static final int STATE_OFF = 10;
 
-    TextView mRemoteRssiVal;
-    RadioGroup mRg;
     private int mState = UART_PROFILE_DISCONNECTED;
     private com.mdex.venusAlpha01a.UartService mService = null;
     private BluetoothDevice mDevice = null;
     private BluetoothAdapter mBtAdapter = null;
-    private ListView messageListView;
-    private ArrayAdapter<String> listAdapter;
+    //private ListView messageListView;
+    //private ArrayAdapter<String> listAdapter;
     private Button btnConnectDisconnect,btnSend;
 
-    private boolean mSave_Flag = false;
-
-    Button mSave_Start;
-    Button mSave_Stop;
-    private String positionCSV = null;
-    Map<String, Object> hmap = null;
-    ArrayList<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
-    TextView mPointTxt;
-
+    ArrayList<String> mlist;
+    ArrayAdapter<String> mAdapter;
+    ListView mStateList;
 
 
 
@@ -156,32 +144,21 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             finish();
             return;
         }
+/*
         messageListView = (ListView) findViewById(R.id.listMessage);
         listAdapter = new ArrayAdapter<String>(this, R.layout.message_detail);
         messageListView.setAdapter(listAdapter);
         messageListView.setDivider(null);
+*/
         btnConnectDisconnect=(Button) findViewById(R.id.btn_select);
         btnSend=(Button) findViewById(R.id.sendButton);
         edtMessage = (EditText) findViewById(R.id.sendText);
-        mSave_Start = (Button)findViewById(R.id.Save_Start);
-        mSave_Stop = (Button)findViewById(R.id.Save_Stop);
-        mPointTxt = (TextView)findViewById(R.id.point);
 
 
-
-        onCreate_UI();
+        UI_onCreate();
 
         service_init();
-       
-        // Handle Disconnect & Connect button
-        /**
-         *
-         * @brief Disconnect Ble with Venus Board
-         * @details if you click this Button, Ble Connection is Stopped
-         * @param
-         * @return
-         * @throws
-         */
+
         btnConnectDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -220,10 +197,12 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 					//send data to service
 					value = message.getBytes("UTF-8");
 					mService.writeRXCharacteristic(value);
+/*
 					//Update the log with time stamp
 					String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
 					listAdapter.add("["+currentDateTimeString+"] TX: "+ message);
                	 	messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
+*/
                	 	edtMessage.setText("");
 				} catch (UnsupportedEncodingException e) {
 					// TODO Auto-generated catch block
@@ -237,14 +216,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
     }
 
-    /**
-     *
-     * @brief UART Service Connected/ DIsConnected
-     * @details Call the Service from UartService.java and check state of connection
-     * @param ComponentName , IBinder
-     * @return
-     * @throws
-     */
 
     //UART service connected/disconnected
     private ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -266,96 +237,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         }
     };
 
-    /**
-     *
-     * @brief To Save Sitting Data, Make CSV File
-     * @details IF you Click the Button, Check the Button String. if the String is'Start Save' then this App Start saving Date and when you click the Button again, Make CSV File
-     * @param
-     * @return
-     * @throws
-     */
-
-    public void onClick_Save(View v){
-        switch (v.getId()) {
-//            case R.id.Save_Start:
-            case R.id.Save_Start:
-
-                if(mSave_Flag==false){
-                    mSave_Flag = true;
-                    mSave_Start.setEnabled(true);
-                    mSave_Start.setText("Save Stop");
-                }else{
-                    mSave_Flag = false;
-                    //파일 생성
-                    createToFilecsv();
-                    mSave_Start.setEnabled(true);
-                    mSave_Start.setText("Save Start");
-                }
-                break;
-
-            case R.id.Save_Stop:
-
-                mSave_Flag = false;
-                //파일 생성
-                createToFilecsv();
-                mSave_Start.setEnabled(true);
-                mSave_Stop.setEnabled(false);
-                break;
-        }
-
-    }
-
-    /**
-     *
-     * @brief Create CSV File
-     * @details When you Click 'Save Stop' Button, this Function count the now date and create CSV File. the File name is TODAY.csv
-     * @param
-     * @return
-     * @throws check the File existed and Direct, Create CSV File
-     */
-
-    private void createToFilecsv(){
-
-        long now = System.currentTimeMillis();
-        Date date = new Date(now);
-        SimpleDateFormat sdfNow = new SimpleDateFormat("yyyyMMdd");
-        String formatDate = sdfNow.format(date);
-
-        try{
-            File file = new File("/mnt/sdcard/Download/" + formatDate + ".csv");
-            if(!file.exists()){
-                file = new File("/mnt/sdcard/Download/" + formatDate + ".csv");
-                file.createNewFile();
-            }
-
-            PrintWriter csvWriter;
-            csvWriter = new  PrintWriter(new FileWriter(file,true));
-
-            csvWriter.print(positionCSV);
-            //csvWriter.print("\r\n");
-            csvWriter.close();
-
-
-            mPointTxt.setText("파일의 저장 경로  : /mnt/sdcard/Download/오늘날짜.csv ");
-
-
-
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-    }
-
-    /**
-     *
-     * @brief To Handler
-     * @details  To Create Handler
-     * @param
-     * @return
-     * @throws
-     */
     private Handler mHandler = new Handler() {
         @Override
         
@@ -368,7 +249,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     /**
      *
      * @brief Receive Broadcast and Check and Action each Function
-     * @details  It receives data from the UarService.java file as a broadcast and performs its function through its value. Manage Bluetooth and device connection status.
+     * @details  It receives data from the UartService.java file as a broadcast and performs its function through its value. Manage Bluetooth and device connection status.
      * @param
      * @return
      * @throws
@@ -389,8 +270,10 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
                          edtMessage.setEnabled(true);
                          btnSend.setEnabled(true);
                          ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ " - connected");
+/*
                          listAdapter.add("["+currentDateTimeString+"] Connected to: "+ mDevice.getName());
                          messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
+*/
                          mState = UART_PROFILE_CONNECTED;
                      }
             	 });
@@ -406,11 +289,11 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
                              edtMessage.setEnabled(false);
                              btnSend.setEnabled(false);
                              ((TextView) findViewById(R.id.deviceName)).setText("Not Connected");
+/*
                              listAdapter.add("["+currentDateTimeString+"] Disconnected to: "+ mDevice.getName());
+*/
                              mState = UART_PROFILE_DISCONNECTED;
                              mService.close();
-                            //setUiState();
-                         
                      }
                  });
             }
@@ -420,31 +303,46 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             if (action.equals(com.mdex.venusAlpha01a.UartService.ACTION_GATT_SERVICES_DISCOVERED)) {
              	 mService.enableTXNotification();
             }
-          //*********************//
+
+            //-----------------------------------------------------
+            // HERE RECEIVE RAW BLE DATA AND PARSE
+            //-----------------------------------------------------
+
             if (action.equals(com.mdex.venusAlpha01a.UartService.ACTION_DATA_AVAILABLE)) {
                 final byte[] packetVenus2Phone = intent.getByteArrayExtra(com.mdex.venusAlpha01a.UartService.EXTRA_DATA);
 
                 runOnUiThread(new Runnable() {
                      public void run() {
                          try {
+/*
                          	String text = new String(packetVenus2Phone, "UTF-8");
                          	String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
                              listAdapter.add("["+currentDateTimeString+"] RX: "+text);
                              messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
+*/
 
                          } catch (Exception e) {
                              Log.e(TAG, e.toString());
                          }
 
-                         //-------------------<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                         if(packetVenus2Phone.length < 20){
+                         if(packetVenus2Phone.length < m_PacketParser.def_PACKET_LENGTH){
                              Log.e(TAG, packetVenus2Phone.toString());
-                             return;
                          }
+                         else {
+                             // receive data and parse
+                             m_PacketParser.onReceiveRawPacket(packetVenus2Phone);
 
-                         m_PacketParser.ParseOnePacket(packetVenus2Phone);
-                         UI_showParsedData();
-                         UI_updateComputedData();
+                             // update sensor data to TextView
+                             UI_updateTextView();
+
+                             // draw center of mess image
+                             UI_drawImage();
+
+                             // save CSV file
+                             if (mSave_Flag==true) {
+                                 UI_CSV_makeCSVdata();
+                             }
+                         }
 
                      }
 
@@ -458,29 +356,13 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         }
     };
 
-    /**
-     *
-     * @brief Service Init
-     * @details
-     * @param
-     * @return
-     * @throws
-     */
     private void service_init() {
         Intent bindIntent = new Intent(this, com.mdex.venusAlpha01a.UartService.class);
         bindService(bindIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
-  
+
         LocalBroadcastManager.getInstance(this).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
     }
 
-    /**
-     *
-     * @brief intenrFilter를 생성하고 값을 설정한는 함수
-     * @details intentFilter를 생성하고 UarService.java에서 각 value를 불러와 Setting 한다.
-     * @param
-     * @return intentFilter
-     * @throws
-     */
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(com.mdex.venusAlpha01a.UartService.ACTION_GATT_CONNECTED);
@@ -494,15 +376,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     public void onStart() {
         super.onStart();
     }
-
-    /**
-     *
-     * @brief 진행중인 서비스 STOP
-     * @details
-     * @param
-     * @return
-     * @throws
-     */
 
     @Override
     public void onDestroy() {
@@ -555,14 +428,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         super.onConfigurationChanged(newConfig);
     }
 
-    /**
-     *
-     * @brief requestCode에 따른 결과 값 도출
-     * @details REQUEST_SELECT_DEVICE -  DeviceListActivity에서 선택된 device의 주소 넘겨 받아 device Connection을 한다.
-     * @param   requestCode, int resultCode, Intent data
-     * @return
-     * @throws
-     */
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -607,14 +473,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     }
 
 
-    /**
-     *
-     * @brief
-     * @details
-     * @param
-     * @return
-     * @throws
-     */
     @Override
     public void onBackPressed() {
         if (mState == UART_PROFILE_CONNECTED) {
@@ -644,32 +502,31 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //  USER VARIABLES
+    //  USER VARIABLES, FUNCTIONS
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //  Variables - UI Vies
     private EditText edtMessage;
     private TextView edtBatteryLevel;
     private TextView edtLastPacketTime;
-    private TextView tvADC_HexaMain;
-    private TextView tvADC_HexaShield;
-    private int mBoardSelect = 1; // 0 : Main board, 1 : Shield board
-
-    private TextView [] atvChairCells_Row0 = new TextView[PacketParser.def_CELL_COUNT_ROW0];
-    private TextView [] atvChairCells_Row1 = new TextView[PacketParser.def_CELL_COUNT_ROW1];
-    private TextView [] atvChairCells_Row2 = new TextView[PacketParser.def_CELL_COUNT_ROW2];
-
-    private TextView edtCOMLog;
-
-    PacketParser m_PacketParser = new PacketParser();
-
-    int def_UI_SERO_START_X = 92;
-    int def_UI_CELL_WIDTH = 63;
-    int def_UI_CELL_HEIGHT = 40;
-
+    private TextView tv_PostureState;
     Space sp_COM_sero;
     Space sp_COC_left;
     Space sp_COC_right;
+    ImageView iv_COM_bar;
+    int nImageCOM_offset = 0;
+    TextView tvFilePathName;
 
+
+    //  Variables - Raw data
+    private TextView [] tvaChairCells_Row0 = new TextView[PacketParser.def_CELL_COUNT_ROW0];
+    private TextView [] tvaChairCells_Row1 = new TextView[PacketParser.def_CELL_COUNT_ROW1];
+    private TextView [] tvaChairCells_Row2 = new TextView[PacketParser.def_CELL_COUNT_ROW2];
+    PacketParser m_PacketParser = new PacketParser();
+
+
+    //  Variables - Posture tag and time
     enum POSTURE_tag{
         POSTURE_NO_LOG,
         POSTURE_LEFT_BAD,
@@ -678,117 +535,103 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         POSTURE_RIGHT,
         POSTURE_RIGHT_BAD
     }
-
     POSTURE_tag m_PostureState;
-    long m_PostureKeepTimeMS = 0;
-
-    MediaPlayer m_Player;
+    long m_PostureOriginTimeMS = elapsedRealtime();
 
 
+    //  Variables - Save CSV
+    Button mSave_Start;
+    private boolean mSave_Flag = false;
+    private String positionCSV = null;
+    Map<String, Object> hmap = null;
 
-    protected void onRadioClicked(View view){
-        switch (view.getId()){
-            case R.id.RB_MAIN:
-                mBoardSelect = 0; // Main board
-                break;
-            case R.id.RB_SHIELD:
-                mBoardSelect = 1; // Shield board
-                break;
-        }
-    }
 
     /**
      *
      * @brief App의 화면의 컨트롤들 선언
      * @details App의 화면을 구성하는 컨트롤들을 불러와 각 변수에 선언하여 사용할수 있게 셌팅한다.
-     * @param
-     * @return
+     * @param void
+     * @return void
      * @throws
      */
-
-    private void onCreate_UI(){
+    private void UI_onCreate(){
         edtBatteryLevel = (TextView) findViewById(R.id.TV_BatteryLevel);
         edtLastPacketTime = (TextView)findViewById(R.id.TV_CurTime);
-        tvADC_HexaMain = (TextView) findViewById(R.id.PacketHexaMain);
-        tvADC_HexaShield = (TextView) findViewById(R.id.PacketHexaShield);
 
         int cell_index = 0;
-        atvChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_0);
-        atvChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_1);
-        atvChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_2);
-        atvChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_3);
-        atvChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_4);
-        atvChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_5);
+        tvaChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_0);
+        tvaChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_1);
+        tvaChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_2);
+        tvaChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_3);
+        tvaChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_4);
+        tvaChairCells_Row0[cell_index] =(TextView)findViewById(R.id.TV_CHAIR_0_5);
 
         cell_index = 0;
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_0);
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_1);
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_2);
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_3);
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_4);
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_5);
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_6);
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_7);
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_8);
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_9);
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_10);
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_11);
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_12);
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_13);
-        atvChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_14);
+        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_0);
+        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_1);
+        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_2);
+        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_3);
+        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_4);
+        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_5);
+        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_6);
+        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_7);
+        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_8);
+        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_9);
+        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_10);
+        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_11);
+        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_12);
+        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_13);
+        tvaChairCells_Row1[cell_index] =(TextView)findViewById(R.id.TV_CHAIR_1_14);
 
         cell_index = 0;
-        atvChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_0);
-        atvChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_1);
-        atvChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_2);
-        atvChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_3);
-        atvChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_4);
-        atvChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_5);
-        atvChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_6);
-        atvChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_7);
-        atvChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_8);
-        atvChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_9);
+        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_0);
+        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_1);
+        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_2);
+        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_3);
+        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_4);
+        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_5);
+        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_6);
+        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_7);
+        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_8);
+        tvaChairCells_Row2[cell_index] =(TextView)findViewById(R.id.TV_CHAIR_2_9);
 
-        edtBatteryLevel.setText(String.format("Battery level : [%2d%%]", 0));
+        edtBatteryLevel.setText(String.format(getString(R.string.fmt_battery_level), 0));
 
-        edtCOMLog = (TextView)findViewById(R.id.TV_COM_LOG );
-
+        tv_PostureState = (TextView)findViewById(R.id.TV_POSTURE_LATERAL );
         sp_COM_sero = (Space)findViewById(R.id.space_COM);
         sp_COC_left = (Space)findViewById(R.id.space_COC_LEFT);
         sp_COC_right = (Space)findViewById(R.id.space_COC_RIGHT);
-
+        iv_COM_bar = (ImageView)findViewById(R.id.iv_COM_SERO);
 
         m_PostureState = POSTURE_tag.POSTURE_NO_LOG;
 
-        //creating media player
-        m_Player = MediaPlayer.create(this, R.raw.alarm_flipover);
-        m_Player.setLooping(false);
-        //m_Player.start();
+        mSave_Start = (Button)findViewById(R.id.Save_Start);
+        tvFilePathName = (TextView)findViewById(R.id.TV_FILEPATH);
 
     }
 
     /**
      *
      * @brief 변수에 value setting
-     * @details 각 변수에 전달 받은 압력값을 Setting 하고 CSV FIle저장 유무에 따라 데이터를 따르 저장한다.
-     * @param
-     * @return
+     * @details 각 변수에 전달 받은 압력값을 Setting 하고 CSV FIle저장 유무에 따라 데이터를 따라 저장한다.
+     * @param void
+     * @return void
      * @throws
      */
-    private void UI_showParsedData(){
-        // last time packet received
-        {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm:ss");
-            Calendar cal = Calendar.getInstance();
-            String time_str = dateFormat.format(cal.getTime());
-            edtLastPacketTime.setText("Last packet : " + time_str);
-        }
-
+    private void UI_updateTextView(){
         if(m_PacketParser.isPacketCompleted() == false)
             return;
 
+        // last time packet received
+        {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm:ss");
+            Calendar cal = Calendar.getInstance();
+            String time_str = dateFormat.format(cal.getTime());
+            edtLastPacketTime.setText(getString(R.string.fmt_time_last_packet) + time_str);
+        }
+
         //  UI - battery level
-        edtBatteryLevel.setText(String.format("Battery level : [%2d%%]", PacketParser.getBatteryLevel()));
+        edtBatteryLevel.setText(String.format(getString(R.string.fmt_battery_level), PacketParser.getBatteryLevel()));
 
         //  UI - cell data and color
         {
@@ -796,186 +639,325 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             int cell_index = 0;
             int row_index = 0;
 
-            hmap = new HashMap<String, Object>();
-
             for (cell_index = 0 ; cell_index < PacketParser.def_CELL_COUNT_ROW0 ; cell_index++){
                 nSensorValue = m_PacketParser.getSensorDataByCoord(row_index, cell_index);
-                atvChairCells_Row0[cell_index].setText(String.format("%d", nSensorValue));
-                atvChairCells_Row0[cell_index].setBackgroundColor(0x00FF0000 | (nSensorValue << 24) );
-
-                if (mSave_Flag==true){
-                    //hmap.put("0_" + cell_index ,  atvChairCells_Row0[cell_index].getText());
-
-                    String nPoint = atvChairCells_Row0[cell_index].getText().toString();
-
-                    if(positionCSV==null){
-                        positionCSV =  "0_" + cell_index + "," + nPoint + ",";
-
-                    }else{
-                        positionCSV = positionCSV + "0_" + cell_index + "," + nPoint + ",";
-                    }
-
-                    /*if(Integer.parseInt(nPoint) > 0){
-                        mPointTxt.append("0_" + cell_index + "," + nPoint + "///");
-                    }*/
-
-                }
-
+                tvaChairCells_Row0[cell_index].setText(String.format("%d", nSensorValue));
+                tvaChairCells_Row0[cell_index].setBackgroundColor(0x00FF0000 | (nSensorValue << 24) );
             }
 
             row_index = 1;
             for (cell_index = 0 ; cell_index < PacketParser.def_CELL_COUNT_ROW1 ; cell_index++){
                 nSensorValue = m_PacketParser.getSensorDataByCoord(row_index, cell_index);
-                atvChairCells_Row1[cell_index].setText(String.format("%d", nSensorValue));
-                atvChairCells_Row1[cell_index].setBackgroundColor(0x00FF0000 | (nSensorValue << 24) );
-
-                String nPoint1 = atvChairCells_Row1[cell_index].getText().toString();
-
-                if (mSave_Flag==true){
-                    //hmap.put("1_" + cell_index ,  atvChairCells_Row0[cell_index].getText());
-                    positionCSV = positionCSV + "1_" + cell_index + "," + nPoint1 + ",";
-
-                }
+                tvaChairCells_Row1[cell_index].setText(String.format("%d", nSensorValue));
+                tvaChairCells_Row1[cell_index].setBackgroundColor(0x00FF0000 | (nSensorValue << 24) );
             }
 
             row_index = 2;
             for (cell_index = 0 ; cell_index < PacketParser.def_CELL_COUNT_ROW2 ; cell_index++){
                 nSensorValue = m_PacketParser.getSensorDataByCoord(row_index, cell_index);
-                atvChairCells_Row2[cell_index].setText(String.format("%d", nSensorValue));
-                atvChairCells_Row2[cell_index].setBackgroundColor(0x00FF0000 | (nSensorValue << 24) );
-
-                String nPoint2 = atvChairCells_Row2[cell_index].getText().toString();
-
-                if (mSave_Flag==true){
-                    //hmap.put("2_" + cell_index ,  atvChairCells_Row0[cell_index].getText());
-
-                    if(cell_index < 9 ){
-                        positionCSV = positionCSV + "2_" + cell_index + "," + nPoint2 + ",";
-
-                    }else{
-                        positionCSV = positionCSV + "2_" + cell_index + "," + nPoint2 + "\r\n";
-                    }
-
-                }
+                tvaChairCells_Row2[cell_index].setText(String.format("%d", nSensorValue));
+                tvaChairCells_Row2[cell_index].setBackgroundColor(0x00FF0000 | (nSensorValue << 24) );
             }
-
-            //list.add(hmap);
         }
-
-        // UI LOG : adc data
-        tvADC_HexaMain.setText(m_PacketParser.textHexaMain);
-        tvADC_HexaShield.setText(m_PacketParser.textHexaShield);
-
     }
 
-    boolean m_isAlarm_2000MS = false;
-    long m_PostureOriginTimeMS = 0L;
 
-
-
-    private void setPostureState(POSTURE_tag posture_state){
-        if(m_PostureState != posture_state) {
-            m_isAlarm_2000MS = false;
+    /**
+     * @brief   현재의 자세를 태그로 저장한다.
+     * @detail  추가로 현재의 자세를 취한 시점의 시간을 저장한다. 이 값은 현재의 자세를 유지할 경우, 몇초간 유지하고 있는 지를 UI에서 보여줄 때 사용된다.
+     * @param   void
+     * @return  void
+     */
+    private void setPostureState(POSTURE_tag posture_state) {
+        if (m_PostureState != posture_state) {
             m_PostureOriginTimeMS = elapsedRealtime();
         }
-
-        //  it's not necessary
         m_PostureState = posture_state;
     }
 
+    /**
+     * @brief   현재의 자세 태그를 반환한다.
+     * @param   void
+     * @return  자세 태그 (POSTURE_tag enum)
+     */
     private POSTURE_tag getPostureState(){
         return m_PostureState;
     }
 
-    private boolean makePostureAlarm_2000MS() {
-        if(m_isAlarm_2000MS == true)
-            return false;
-
-        m_Player.start();
-        m_isAlarm_2000MS = true;
-        return true;
+    /**
+     * @brief   현재의 자세를 취한 시간 길이를 측정하여 반환한다.
+     * @param   void
+     * @return  시간 (초 단위)
+     */
+    private long getPostureElapsedSecond(){
+        return (elapsedRealtime() - m_PostureOriginTimeMS) / 1000;
     }
 
-    private long getPostureElapsedTime(){
-        return (elapsedRealtime() - m_PostureOriginTimeMS);
-    }
 
     /**
-     *
-     * @brief App의 화면에서 보여지는 UI부분에 해당 값을 출력하는 함수
-     * @details 센서로 부터 압력 값을 전달받는다. 전달 받은 값이 빈 값이면 비어있는 시간과 함께 출력해주고 센서에 값이 들어오면 해당 값과 이미지를 출력해준다.
+     * @brief UI 화면에 무게 중심을 표시해주는 함수(COM : Center of Mess)
+     * @details 센서에서 측정한 압력 값으로 COM 값을 계산한다. 이를 이미지로 화면에 뿌려준다.
      * @param
      * @return
      * @throws
      */
-    private void UI_updateComputedData(){
-        if(m_PacketParser.isPostureValid_Row1() == false){
+    private void UI_drawImage(){
+        if(m_PacketParser.isSeatOccupied() == false){
             setPostureState(POSTURE_tag.POSTURE_NO_LOG);
-            edtCOMLog.setText(String.format("EMPTY, %d sec", getPostureElapsedTime() / 1000));
+            tv_PostureState.setText(String.format("EMPTY, %d sec", getPostureElapsedSecond()));
 
             return;
         }
 
-        //  UI draw COM - sero
+
+        //--------------------------------------------------------------------
+        //  Finding coordinate back data to draw line
+        //--------------------------------------------------------------------
+
+        //  UI - calculate summation of Row1 textview array
+        int ui_cell_width =  tvaChairCells_Row1[0].getMeasuredWidth();
+        int ui_coc_area_size = ui_cell_width * PacketParser.def_CELL_COUNT_ROW1;
+
+        //  UI - finding left margin of Row1 textview array
+        int[] locations = new int[2];
+        tvaChairCells_Row1[0].getLocationOnScreen(locations);
+        int ui_left_of_most_left_cell = locations[0];
+        int ui_left_margin = ui_coc_area_size / 2 + ui_left_of_most_left_cell;
+
+        //  UI - half of imageview "COM"
+        nImageCOM_offset = iv_COM_bar.getMeasuredWidth() / 2;
+
+        //  find COM coordinate
+        float proportion_com_x  = m_PacketParser.getLateralCOM_Row1();
+        int ui_com_x            = ui_left_margin + (int)(ui_cell_width * proportion_com_x) - nImageCOM_offset;
+
+        //  find COC left coordinate
+        float proportion_coc_left   = m_PacketParser.getLateralCOC_left_Row1();
+        int ui_coc_left             = ui_left_margin + (int)(ui_cell_width * proportion_coc_left);
+
+        //  find COC right coordinate
+        float proportion_coc_right  = m_PacketParser.getLateralCOC_right_Row1();
+        int ui_coc_right            = ui_left_margin + (int)(ui_cell_width * proportion_coc_right);
+
+        UI_list(proportion_com_x, proportion_coc_left,proportion_coc_right );
+
+        //--------------------------------------------------------------------
+        //  Draw Images - COM, Left COC, Right COC
+        //--------------------------------------------------------------------
+
+        //  UI draw COM image
         {
-            float com_coord_x = m_PacketParser.getCOM_x_Row1();
 
             //  calculate COM - lateral
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)sp_COM_sero.getLayoutParams();
-            params.setMargins(0, 0, (int)(def_UI_CELL_WIDTH * com_coord_x) + def_UI_SERO_START_X, 0); //substitute parameters for left, top, right, bottom
+            params.setMargins(0, 0, ui_com_x, 0); //substitute parameters for left, top, right, bottom
             sp_COM_sero.setLayoutParams(params);
 
-            float com_coord_x_central = com_coord_x - 7.0F;
-            if(com_coord_x < 6.3F){
-                edtCOMLog.setText(String.format("LEFT - BAD (%1.3f), %d sec", com_coord_x_central, getPostureElapsedTime() / 1000));
+
+            if(proportion_com_x < -1.0F){
+                tv_PostureState.setText(String.format("LEFT - BAD (%1.3f), %d sec", proportion_com_x, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_LEFT_BAD);
+
             }
-            else if(com_coord_x < 6.7F){
-                edtCOMLog.setText(String.format("LEFT (%1.3f), %d sec", com_coord_x_central, getPostureElapsedTime() / 1000));
+            else if(proportion_com_x < -0.4F){
+                tv_PostureState.setText(String.format("LEFT (%1.3f), %d sec", proportion_com_x, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_LEFT);
             }
-            else if(com_coord_x < 7.3F){
-                edtCOMLog.setText(String.format("CENTER (%1.3f), %d sec", com_coord_x_central, getPostureElapsedTime() / 1000));
+            else if(proportion_com_x < 0.4F){
+                tv_PostureState.setText(String.format("CENTER (%1.3f), %d sec", proportion_com_x, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_CENTER);
             }
-            else if(com_coord_x < 7.7F){
-                edtCOMLog.setText(String.format("RIGHT (%1.3f), %d sec", com_coord_x_central, getPostureElapsedTime() / 1000));
+            else if(proportion_com_x < 1.0F){
+                tv_PostureState.setText(String.format("RIGHT (%1.3f), %d sec", proportion_com_x, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_RIGHT);
             }
             else {
-                edtCOMLog.setText(String.format("RIGHT - BAD (%1.3f), %d sec", com_coord_x_central, getPostureElapsedTime() / 1000));
+                tv_PostureState.setText(String.format("RIGHT - BAD (%1.3f), %d sec", proportion_com_x, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_RIGHT_BAD);
             }
         }
 
-        //  make alarm of bad posture
-        if(2000 < getPostureElapsedTime()) {
-            switch (getPostureState()){
-                case POSTURE_LEFT_BAD:
-                case POSTURE_LEFT:
-                case POSTURE_RIGHT:
-                case POSTURE_RIGHT_BAD:
-                    makePostureAlarm_2000MS();
-                    break;
-            }
-        }
 
-        //  UI draw COC
+        //  UI draw left line of COC
         {
-            float coc_coord_left = m_PacketParser.getCOC_left_Row1();
             //  calculate COC - left
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) sp_COC_left.getLayoutParams();
-            params.setMargins(0, 0, (int) (def_UI_CELL_WIDTH * coc_coord_left) + def_UI_SERO_START_X, 0); //substitute parameters for left, top, right, bottom
+            params.setMargins(0, 0, ui_coc_left, 0); //substitute parameters for left, top, right, bottom
             sp_COC_left.setLayoutParams(params);
         }
 
+        //  UI draw right line of COC
         {
-            float coc_coord_right = m_PacketParser.getCOC_right_Row1();
             //  calculate COC - right
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)sp_COC_right.getLayoutParams();
-            params.setMargins(0, 0, (int)(def_UI_CELL_WIDTH * coc_coord_right) + def_UI_SERO_START_X, 0); //substitute parameters for left, top, right, bottom
+            params.setMargins(0, 0, ui_coc_right, 0); //substitute parameters for left, top, right, bottom
             sp_COC_right.setLayoutParams(params);
         }
+    }
+
+
+    private void UI_CSV_makeCSVdata() {
+        if(m_PacketParser.isPacketCompleted() == false)
+            return;
+
+        //  UI - cell data and color
+        {
+            int cell_index = 0;
+
+            hmap = new HashMap<String, Object>();
+
+            //  Row 0
+            for (cell_index = 0 ; cell_index < PacketParser.def_CELL_COUNT_ROW0 ; cell_index++){
+                String nPoint = tvaChairCells_Row0[cell_index].getText().toString();
+
+                if(positionCSV==null){
+                    positionCSV =  "0_" + cell_index + "," + nPoint + ",";
+                }else{
+                    positionCSV = positionCSV + "0_" + cell_index + "," + nPoint + ",";
+                }
+            }
+
+            //  Row 1
+            for (cell_index = 0 ; cell_index < PacketParser.def_CELL_COUNT_ROW1 ; cell_index++){
+                String nPoint1 = tvaChairCells_Row1[cell_index].getText().toString();
+
+                positionCSV = positionCSV + "1_" + cell_index + "," + nPoint1 + ",";
+            }
+
+            //  Row 2
+            for (cell_index = 0 ; cell_index < PacketParser.def_CELL_COUNT_ROW2 ; cell_index++){
+                String nPoint2 = tvaChairCells_Row2[cell_index].getText().toString();
+
+                if(cell_index < 9 ){
+                    positionCSV = positionCSV + "2_" + cell_index + "," + nPoint2 + ",";
+
+                }else{
+                    positionCSV = positionCSV + "2_" + cell_index + "," + nPoint2 + "\r\n";
+                }
+            }
+
+        }
+    }
+
+
+    /**
+     *
+     * @brief To Save Sitting Data, Make CSV File
+     * @details IF you Click the Button, Check the Button String. if the String is'Start Save' then this App Start saving Date and when you click the Button again, Make CSV File
+     * @param
+     * @return
+     * @throws
+     */
+
+    public void UI_onClickSaveCSV(View v) {
+        //  if : toggle - start save
+        if (mSave_Flag == false) {
+            mSave_Flag = true;
+            mSave_Start.setEnabled(true);
+            mSave_Start.setText(getString(R.string.fmt_stop_save));
+        }
+        //  else : toggle - stop save
+        else {
+            mSave_Flag = false;
+            //파일 생성
+            UI_saveCSVFile();
+            mSave_Start.setEnabled(true);
+            mSave_Start.setText(getString(R.string.fmt_start_save));
+            Toast.makeText(this, getString(R.string.fmt_save_msg), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void UI_list(float pcom, float Pleft, float Pright){
+
+        //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mess : 0 \n lateral vector : 0.0"/>
+        mlist = new ArrayList<String>();
+        mlist.add("contour, left edge = " + String.format("%1.1f",Pleft) +"//" + " right edge = " + Pright);
+        mlist.add("center of contour = " + String.format("%1.1f",(Pleft + Pright/2)));
+        mlist.add("center of mess = " + String.format("%1.1f",pcom));
+        mlist.add("lateral Vector = " + (pcom - (Pleft + Pright/2)));
+
+        //mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mlist);
+
+        mAdapter = new CustomAdapter(this, 0, mlist);
+
+
+        mStateList = (ListView)findViewById(R.id.TV_SEAT_LOG);
+
+        mStateList.setAdapter(mAdapter);
+
+    }
+
+    private class CustomAdapter extends ArrayAdapter<String>{
+
+        public CustomAdapter(Context context, int textViewResourceId, ArrayList<String> objects) {
+            super(context, textViewResourceId, objects);
+            //this.mlist = objects;
+        }
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View v = convertView;
+            if (v == null) {
+                LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                v = vi.inflate(R.layout.state_list, null);
+            }
+
+            // ImageView 인스턴스
+            ImageView imageView = (ImageView)v.findViewById(R.id.imageView);
+
+            // 리스트뷰의 아이템에 이미지를 변경한다.
+            if(mlist.get(position).substring(0, 7).equals("contour"))
+                imageView.setImageResource(R.drawable.coc_sero_left);
+            else if(mlist.get(position).substring(0, 17).equals("center of contour"))
+                imageView.setImageResource(R.drawable.test_sero);
+            else if(mlist.get(position).substring(0, 14).equals("center of mess"))
+                imageView.setImageResource(R.drawable.test_sero);
+            else if(mlist.get(position).substring(0, 7).equals("lateral"))
+                imageView.setImageResource(R.drawable.background_posture);
+
+
+            TextView textView = (TextView)v.findViewById(R.id.textView);
+            textView.setText(mlist.get(position));
+
+            final String text = mlist.get(position);
+
+            return v;
+        }
+    }
+
+    /**
+     *
+     * @brief save CSV File
+     * @details When you Click 'Save Stop' Button, this Function count the now date and create CSV File. the File name is TODAY.csv
+     * @param none
+     * @return none
+     * @throws check the File existed and Direct, Create CSV File
+     */
+    private void UI_saveCSVFile(){
+
+        long now = System.currentTimeMillis();
+        Date date = new Date(now);
+        SimpleDateFormat sdfNow = new SimpleDateFormat("yyyyMMdd");
+        String formatDate = sdfNow.format(date);
+
+        try{
+            File file = new File("/mnt/sdcard/Download/" + formatDate + ".csv");
+            if(!file.exists()){
+                file = new File("/mnt/sdcard/Download/" + formatDate + ".csv");
+                file.createNewFile();
+            }
+
+            PrintWriter csvWriter;
+            csvWriter = new  PrintWriter(new FileWriter(file,true));
+
+            csvWriter.print(positionCSV);
+            //csvWriter.print("\r\n");
+            csvWriter.close();
+
+            tvFilePathName.setText("File path : /mnt/sdcard/Download/" + formatDate + ".csv");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
 }

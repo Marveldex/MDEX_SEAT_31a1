@@ -40,6 +40,7 @@
     </style>
     <color name="black">#FF000000</color>
     <color name="whitegrey">#FFF2F2F2</color>
+    <color name="yellow">#cfa50c</color>
     <!-- AlertDialog text color fix thanks to Shawn Castrianni, see: http://groups.google.com/group/android-developers/browse_thread/thread/f0b34621d3a70c4b -->
     <style name="DialogLight" parent="@android:style/Theme.Dialog">
         

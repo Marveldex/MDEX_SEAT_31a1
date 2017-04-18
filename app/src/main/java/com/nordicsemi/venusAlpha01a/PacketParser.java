@@ -19,14 +19,15 @@ import android.graphics.Rect;
  */
 
 public class PacketParser {
+    public static int def_PACKET_LENGTH = 20;
     public static byte m_BatteryLevel = 0;
     public static byte def_CELL_COUNT_ROW0 = 6;
     public static byte def_CELL_COUNT_ROW1 = 15;
     public static byte def_CELL_COUNT_ROW2 = 10;
 
-    public static byte [] nChairVal_Row0 = new byte [def_CELL_COUNT_ROW0];
-    public static byte [] nChairVal_Row1 = new byte [def_CELL_COUNT_ROW1];
-    public static byte [] nChairVal_Row2 = new byte [def_CELL_COUNT_ROW2];
+    public static byte [] nPressureValue_Row0 = new byte [def_CELL_COUNT_ROW0];
+    public static byte [] nPressureValue_Row1 = new byte [def_CELL_COUNT_ROW1];
+    public static byte [] nPressureValue_Row2 = new byte [def_CELL_COUNT_ROW2];
 
     final byte [] packet_data_32bit = new byte[20];
 
@@ -34,6 +35,9 @@ public class PacketParser {
     public static final byte [] adcValue_S = new byte[20]; // ADC of Shield
 
     public static boolean m_isPacketCompleted = false;
+
+    private static int def_THRESHOLD_VALID_LOWEST = 5;
+    private static int def_THRESHOLD_VALUE_SEAT_OCCUPIED = 5;//200;
 
     public static String textHexaMain = " ";
     public static String textHexaShield = " ";
@@ -45,11 +49,11 @@ public class PacketParser {
     public static byte getSensorDataByCoord(int nRowIndex, int nColIndex){
         switch (nRowIndex){
             case 0:
-                return nChairVal_Row0[nColIndex];
+                return nPressureValue_Row0[nColIndex];
             case 1:
-                return nChairVal_Row1[nColIndex];
+                return nPressureValue_Row1[nColIndex];
             case 2:
-                return nChairVal_Row2[nColIndex];
+                return nPressureValue_Row2[nColIndex];
         }
 
         return 0;
@@ -58,20 +62,21 @@ public class PacketParser {
     /**
      *
      * @brief    전달 받은 압력 값을 구분하고 해당 값들을 변수에 Setting
-     * @details
+     * @details 1) Convert 8bit to 32bit, 2) Distinguish what if this packet is 'M' or 'S' and store to buffer 3) Reorder sensor sequence after last packet ('S') arrived.
      * @param
      * @return
      * @throws
      */
 
-    public void ParseOnePacket(byte [] packet_raw_data){
+    public void onReceiveRawPacket(byte [] packet_raw_data){
+        //  1) Convert 8bit to 32bit
         for(int index = 0 ; index < 20 ; index++){
             packet_data_32bit[index] = packet_raw_data[index];// & 0xff;
         }
 
-        int cell_index = 0;
 
-        // select board
+        //  2) Distinguish what if this packet is 'M' or 'S' and store to buffer
+        //  whole packet is 31byte long. It's divided 2 packets. 'M' is first, 'S' is last. So complete packet is assembled when 'S' is arrived.
         if( packet_data_32bit[0] == 'M'){
             textHexaMain = String.format("Ma: %3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d",
                     packet_data_32bit[1], packet_data_32bit[2], packet_data_32bit[3], packet_data_32bit[4], packet_data_32bit[5], packet_data_32bit[6], packet_data_32bit[7], packet_data_32bit[8],
@@ -90,70 +95,65 @@ public class PacketParser {
             m_isPacketCompleted = true;
         }
 
-        //  assemble two packets into one.
-        //  whole packet is 31byte long. It's divided 2 packets. 'M' is first, 'S' is last. So complete packet is assembled when 'S' is arrived.
-        if( packet_data_32bit[0] == 'S') {
-            cell_index = 0;
-            nChairVal_Row0[cell_index++] = adcValue_M[10];
-            nChairVal_Row0[cell_index++] = adcValue_M[12];
-            nChairVal_Row0[cell_index++] = adcValue_M[14];
-            nChairVal_Row0[cell_index++] = adcValue_S[0];
-            nChairVal_Row0[cell_index++] = adcValue_S[2];
-            nChairVal_Row0[cell_index++] = adcValue_S[4];
-
-            cell_index = 0;
-            nChairVal_Row1[cell_index++] = adcValue_M[5];
-            nChairVal_Row1[cell_index++] = adcValue_M[6];
-            nChairVal_Row1[cell_index++] = adcValue_M[7];
-            nChairVal_Row1[cell_index++] = adcValue_M[8];
-            nChairVal_Row1[cell_index++] = adcValue_M[9];
-            nChairVal_Row1[cell_index++] = adcValue_M[11];
-            nChairVal_Row1[cell_index++] = adcValue_M[13];
-            nChairVal_Row1[cell_index++] = adcValue_M[15];
-            nChairVal_Row1[cell_index++] = adcValue_S[1];
-            nChairVal_Row1[cell_index++] = adcValue_S[3];
-            nChairVal_Row1[cell_index++] = adcValue_S[5];
-            nChairVal_Row1[cell_index++] = adcValue_S[6];
-            nChairVal_Row1[cell_index++] = adcValue_S[7];
-            nChairVal_Row1[cell_index++] = adcValue_S[8];
-            nChairVal_Row1[cell_index++] = adcValue_S[9];
-
-            cell_index = 0;
-            nChairVal_Row2[cell_index++] = adcValue_M[0];
-            nChairVal_Row2[cell_index++] = adcValue_M[1];
-            nChairVal_Row2[cell_index++] = adcValue_M[2];
-            nChairVal_Row2[cell_index++] = adcValue_M[3];
-            nChairVal_Row2[cell_index++] = adcValue_M[4];
-            nChairVal_Row2[cell_index++] = adcValue_S[10];
-            nChairVal_Row2[cell_index++] = adcValue_S[11];
-            nChairVal_Row2[cell_index++] = adcValue_S[12];
-            nChairVal_Row2[cell_index++] = adcValue_S[13];
-            nChairVal_Row2[cell_index++] = adcValue_S[14];
+        //  3) Reorder sensor sequence after last packet ('S') arrived.
+        if( m_isPacketCompleted == true) {
+            reorderSensorSequence();
         }
 
 //      parse battery level
-        {
-            m_BatteryLevel = packet_data_32bit[17];
-            String textHexa = String.format("Battery level : [%2d%%]", m_BatteryLevel);
-
-            // in case of packet_data_32bit[17] is 8bit value of battery raw adc value.
-            // int    BATTERY_VOLT_SHIFT = 250;
-            // int    SCALE_OF_ADC = 100;
-            // float  bat_volt = 0.0F;
-            // bat_volt = (float)(packet_data_32bit[17] + BATTERY_VOLT_SHIFT) / SCALE_OF_ADC;
-            // String textHexa = String.format("Device voltage : %1.2f V (%d)", bat_volt, packet_data_32bit[17]);
-        }
+        m_BatteryLevel = packet_data_32bit[17];
 
     }
 
-    public static boolean isPostureValid_Row1(){
+    private void reorderSensorSequence(){
+        int cell_index;
+
+        cell_index = 0;
+        nPressureValue_Row0[cell_index++] = adcValue_M[10];
+        nPressureValue_Row0[cell_index++] = adcValue_M[12];
+        nPressureValue_Row0[cell_index++] = adcValue_M[14];
+        nPressureValue_Row0[cell_index++] = adcValue_S[0];
+        nPressureValue_Row0[cell_index++] = adcValue_S[2];
+        nPressureValue_Row0[cell_index] = adcValue_S[4];
+
+        cell_index = 0;
+        nPressureValue_Row1[cell_index++] = adcValue_M[5];
+        nPressureValue_Row1[cell_index++] = adcValue_M[6];
+        nPressureValue_Row1[cell_index++] = adcValue_M[7];
+        nPressureValue_Row1[cell_index++] = adcValue_M[8];
+        nPressureValue_Row1[cell_index++] = adcValue_M[9];
+        nPressureValue_Row1[cell_index++] = adcValue_M[11];
+        nPressureValue_Row1[cell_index++] = adcValue_M[13];
+        nPressureValue_Row1[cell_index++] = adcValue_M[15];
+        nPressureValue_Row1[cell_index++] = adcValue_S[1];
+        nPressureValue_Row1[cell_index++] = adcValue_S[3];
+        nPressureValue_Row1[cell_index++] = adcValue_S[5];
+        nPressureValue_Row1[cell_index++] = adcValue_S[6];
+        nPressureValue_Row1[cell_index++] = adcValue_S[7];
+        nPressureValue_Row1[cell_index++] = adcValue_S[8];
+        nPressureValue_Row1[cell_index] = adcValue_S[9];
+
+        cell_index = 0;
+        nPressureValue_Row2[cell_index++] = adcValue_M[0];
+        nPressureValue_Row2[cell_index++] = adcValue_M[1];
+        nPressureValue_Row2[cell_index++] = adcValue_M[2];
+        nPressureValue_Row2[cell_index++] = adcValue_M[3];
+        nPressureValue_Row2[cell_index++] = adcValue_M[4];
+        nPressureValue_Row2[cell_index++] = adcValue_S[10];
+        nPressureValue_Row2[cell_index++] = adcValue_S[11];
+        nPressureValue_Row2[cell_index++] = adcValue_S[12];
+        nPressureValue_Row2[cell_index++] = adcValue_S[13];
+        nPressureValue_Row2[cell_index] = adcValue_S[14];
+    }
+
+
+    public static boolean isSeatOccupied(){
         int summation = 0;
         for(int i = 0 ; i < def_CELL_COUNT_ROW1 ; i++) {
-            summation += nChairVal_Row1[i];
+            summation += nPressureValue_Row1[i];
 
-            if(200 < summation) {
+            if(def_THRESHOLD_VALUE_SEAT_OCCUPIED < summation)
                 return true;
-            }
         }
 
         return false;
@@ -162,82 +162,56 @@ public class PacketParser {
 
     /**
      *
-     * @brief
+     * @brief calculate lateral COM
      * @details
      * @param
      * @return
-     * @throws
      */
+    public static float getLateralCOM_Row1(){
+        int summation_mess = 0;
+        float summation_mess_x_position = 0;
+        float position;
 
-    public static float getCOM_x_Row1(){
-        //  calculate COM - lateral
-        int peak_value = 0;
-        int peak_position = 0;
-        int average_value = 0;
-        int summation_value = 0;
-        float level_pos = 0.0f;
-        int pressure_new = 0;
-
-        float position_weight = 0.0f; // 1.0f = pos of 1st dot, 0.0f = pos of 0th dot
-        {
-            for(int i = 0 ; i < def_CELL_COUNT_ROW1 ; i++) {
-                if(peak_value < nChairVal_Row1[i]) {
-                    peak_value = nChairVal_Row1[i];
-                    peak_position = i;
-                }
-
-                if(0 < i) {
-                    if( (nChairVal_Row1[i] == 0) && (summation_value == 0) ) {
-                    }
-                    else {
-                        level_pos = i;
-                        pressure_new = nChairVal_Row1[i];
-                        position_weight = position_weight + (level_pos - position_weight) * pressure_new / (pressure_new + summation_value);
-                    }
-                }
-
-                summation_value += nChairVal_Row1[i];
-
-            }
-            average_value = summation_value / def_CELL_COUNT_ROW1;
-
-            String strText = String.format("Peek value : %d\nAverage value : %d\nCenter of pressure : %1.4f", peak_value, average_value, position_weight);
+        for(int i = 0 ; i < def_CELL_COUNT_ROW1 ; i++) {
+            position = (float)i;
+            summation_mess_x_position += (nPressureValue_Row1[i] * position);
+            summation_mess += nPressureValue_Row1[i];
         }
 
-        return position_weight;
+        float position_lateral_COM = summation_mess_x_position / summation_mess;
 
-        //  calculate COM - lean
-        //  calculate COC - lateral
+        return (position_lateral_COM - 7.0f); // 7.0f means center position sensor of 1st row has index of 7. So 7 is center coordnate.
     }
 
-    public static float getCOC_left_Row1() {
+
+    public static float getLateralCOC_left_Row1() {
         int cell_index = 0;
         for(cell_index = 0 ; cell_index < def_CELL_COUNT_ROW1 ; cell_index++) {
-            if(5 < nChairVal_Row1[cell_index]) {
+            if(def_THRESHOLD_VALID_LOWEST < nPressureValue_Row1[cell_index]) {
                 break;
             }
         }
         if(cell_index == def_CELL_COUNT_ROW1)
             cell_index = 0;
 
-        //float coord_left = (float)cell_index - (float)def_CELL_COUNT_ROW1 / 2;
-        float coord_left = (float)cell_index;
+        float coord_left = (float)cell_index - 7.0F; // 7.0F is center point of row 1
+        //float coord_left = (float)cell_index;
 
         return coord_left;
     }
 
-    public static float getCOC_right_Row1() {
+    public static float getLateralCOC_right_Row1() {
         int cell_index = 0;
         for(cell_index = (def_CELL_COUNT_ROW1 - 1) ; 0 <= cell_index ; cell_index--) {
-            if(5 < nChairVal_Row1[cell_index]) {
+            if(def_THRESHOLD_VALID_LOWEST < nPressureValue_Row1[cell_index]) {
                 break;
             }
         }
         if(cell_index == 0)
             cell_index = def_CELL_COUNT_ROW1 - 1;
 
-        //float coord_right = (float)cell_index - (float)def_CELL_COUNT_ROW1 / 2;
-        float coord_right = (float)cell_index;
+        float coord_right = (float)cell_index - 7.0F; // 7.0F is center point of row 1
+        //float coord_right = (float)cell_index;
 
         return coord_right;
     }
@@ -248,14 +222,6 @@ public class PacketParser {
 
     public static byte getBatteryLevel(){
         return m_BatteryLevel;
-    }
-
-    public static byte [] getDataMainBoard(){
-        return adcValue_M;
-    }
-
-    public static byte [] getDataShieldBoard(){
-        return adcValue_S;
     }
 
 }

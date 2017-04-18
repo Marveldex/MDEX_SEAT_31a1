@@ -22,7 +22,7 @@
   -->
 <resources>
 
-    <string name="app_name">Venus Engineer (V.0.2-170101)</string>
+    <string name="app_name">Venus SDK (V.0.2-170405)</string>
     <string name="popup_title">Quit Health seat</string>
     <string name="device">Device:</string>
     <string name="no_device">&lt;Select a device&gt;</string>
@@ -69,5 +69,17 @@
     <string name="ble_not_supported">Bluetooth Low Energy not supported</string>
     <string name="scan">Scan</string>
     <string name="cancel">Cancel</string>
-    
+    <string name="ui_connect">Connect</string>
+    <string name="ui_battery_level">Battery Level :</string>
+    <string name="ui_last_packet_time">Last : </string>
+    <string name="ui_posture_lateral">POSTURE LATERAL</string>
+    <string name="ui_posture_longitudinal">POSTURE LONGITUDINAL</string>
+    <string name="ui_start_save">Save to CSV</string>
+    <string name="ui_device_none">none (connect to Marveldex device)</string>
+    <string name="fmt_battery_level">Battery level : [%2d%%]</string>
+    <string name="fmt_time_last_packet">Last packet : </string>
+    <string name="fmt_start_save">Save to CSV</string>
+    <string name="fmt_stop_save">Stop save</string>
+    <string name="fmt_save_msg">Save successfully</string>
+
 </resources>

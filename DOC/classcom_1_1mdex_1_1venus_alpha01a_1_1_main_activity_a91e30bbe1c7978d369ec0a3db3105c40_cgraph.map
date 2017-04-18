@@ -1,0 +1,9 @@
+<map id="com.mdex.venusAlpha01a.MainActivity.onRadioClicked" name="com.mdex.venusAlpha01a.MainActivity.onRadioClicked">
+<area shape="rect" id="node2" href="$classcom_1_1nordicsemi_1_1venus_alpha01a_1_1_packet_parser.html#a24347083c8e46d2752850c037bd6b423" title="com.nordicsemi.venusAlpha01a.\lPacketParser.getBatteryLevel" alt="" coords="276,5,485,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1nordicsemi_1_1venus_alpha01a_1_1_packet_parser.html#a1f32bc48e80d87f288037a25f8342165" title="com.nordicsemi.venusAlpha01a.\lPacketParser.getCOC_left_Row1" alt="" coords="273,71,488,112"/>
+<area shape="rect" id="node4" href="$classcom_1_1nordicsemi_1_1venus_alpha01a_1_1_packet_parser.html#a7f48168c8a7a596d599d26b8cb603141" title="com.nordicsemi.venusAlpha01a.\lPacketParser.getCOC_right_Row1" alt="" coords="269,136,492,177"/>
+<area shape="rect" id="node5" href="$classcom_1_1nordicsemi_1_1venus_alpha01a_1_1_packet_parser.html#a3a648107714bc21d5f02ded023a5220d" title="com.nordicsemi.venusAlpha01a.\lPacketParser.getCOM_x_Row1" alt="" coords="276,201,485,243"/>
+<area shape="rect" id="node6" href="$classcom_1_1nordicsemi_1_1venus_alpha01a_1_1_packet_parser.html#a5902ab2d7ddde3c7c7ef39db4235e11f" title="com.nordicsemi.venusAlpha01a.\lPacketParser.getSensorDataByCoord" alt="" coords="260,267,501,308"/>
+<area shape="rect" id="node7" href="$classcom_1_1nordicsemi_1_1venus_alpha01a_1_1_packet_parser.html#ab20ec82e52b01d98648e1afe3ae98606" title="com.nordicsemi.venusAlpha01a.\lPacketParser.isPacketCompleted" alt="" coords="271,332,490,373"/>
+<area shape="rect" id="node8" href="$classcom_1_1nordicsemi_1_1venus_alpha01a_1_1_packet_parser.html#ad4128b5bdd18468d7e2650ffd19db2ee" title="com.nordicsemi.venusAlpha01a.\lPacketParser.isPostureValid_Row1" alt="" coords="267,397,495,439"/>
+</map>
