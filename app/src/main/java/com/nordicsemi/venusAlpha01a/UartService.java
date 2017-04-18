@@ -53,7 +53,11 @@ import java.util.UUID;
  * @author Marveldex
  * @date 2017-03-17
  * @version 0.0.1
+<<<<<<< HEAD
  * @li  BLE Connection...
+=======
+ * @li 참고 BLE Connection
+>>>>>>> origin/master
  *
  */
 public class UartService extends Service {

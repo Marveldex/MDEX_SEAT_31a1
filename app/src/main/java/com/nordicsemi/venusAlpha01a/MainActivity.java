@@ -158,7 +158,20 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         UI_onCreate();
 
         service_init();
+<<<<<<< HEAD
 
+=======
+       
+        // Handle Disconnect & Connect button
+        /**
+         *
+         * @brief Disconnect Ble with Venus Board
+         * @details if you click this Button, Ble Connection is Stopped
+         * @param
+         * @return
+         * @throws
+         */
+>>>>>>> origin/master
         btnConnectDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -216,6 +229,17 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     *
+     * @brief UART Service Connected/ DIsConnected
+     * @details Call the Service from UartService.java and check state of connection
+     * @param ComponentName , IBinder
+     * @return
+     * @throws
+     */
+>>>>>>> origin/master
 
     //UART service connected/disconnected
     private ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -237,6 +261,99 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         }
     };
 
+<<<<<<< HEAD
+=======
+    /**
+     *
+     * @brief To Save Sitting Data, Make CSV File
+     * @details IF you Click the Button, Check the Button String. if the String is'Start Save' then this App Start saving Date and when you click the Button again, Make CSV File
+     * @param
+     * @return
+     * @throws
+     */
+
+    public void onClick_Save(View v){
+        switch (v.getId()) {
+//            case R.id.Save_Start:
+            case R.id.Save_Start:
+
+                if(mSave_Flag==false){
+                    mSave_Flag = true;
+                    mSave_Start.setEnabled(true);
+                    mSave_Start.setText("Save Stop");
+                }else{
+                    mSave_Flag = false;
+                    //파일 생성
+                    createToFilecsv();
+                    mSave_Start.setEnabled(true);
+                    mSave_Start.setText("Save Start");
+                }
+                break;
+
+            case R.id.Save_Stop:
+
+                mSave_Flag = false;
+                //파일 생성
+                createToFilecsv();
+                mSave_Start.setEnabled(true);
+                mSave_Stop.setEnabled(false);
+                break;
+        }
+
+    }
+
+    /**
+     *
+     * @brief Create CSV File
+     * @details When you Click 'Save Stop' Button, this Function count the now date and create CSV File. the File name is TODAY.csv
+     * @param
+     * @return
+     * @throws check the File existed and Direct, Create CSV File
+     */
+
+    private void createToFilecsv(){
+
+        long now = System.currentTimeMillis();
+        Date date = new Date(now);
+        SimpleDateFormat sdfNow = new SimpleDateFormat("yyyyMMdd");
+        String formatDate = sdfNow.format(date);
+
+        try{
+            File file = new File("/mnt/sdcard/Download/" + formatDate + ".csv");
+            if(!file.exists()){
+                file = new File("/mnt/sdcard/Download/" + formatDate + ".csv");
+                file.createNewFile();
+            }
+
+            PrintWriter csvWriter;
+            csvWriter = new  PrintWriter(new FileWriter(file,true));
+
+            csvWriter.print(positionCSV);
+            //csvWriter.print("\r\n");
+            csvWriter.close();
+
+
+            mPointTxt.setText("파일의 저장 경로  : /mnt/sdcard/Download/오늘날짜.csv ");
+
+
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     *
+     * @brief To Handler
+     * @details  To Create Handler
+     * @param
+     * @return
+     * @throws
+     */
+>>>>>>> origin/master
     private Handler mHandler = new Handler() {
         @Override
         
@@ -249,7 +366,11 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     /**
      *
      * @brief Receive Broadcast and Check and Action each Function
+<<<<<<< HEAD
      * @details  It receives data from the UartService.java file as a broadcast and performs its function through its value. Manage Bluetooth and device connection status.
+=======
+     * @details  It receives data from the UarService.java file as a broadcast and performs its function through its value. Manage Bluetooth and device connection status.
+>>>>>>> origin/master
      * @param
      * @return
      * @throws
@@ -356,6 +477,14 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         }
     };
 
+    /**
+     *
+     * @brief Service Init
+     * @details
+     * @param
+     * @return
+     * @throws
+     */
     private void service_init() {
         Intent bindIntent = new Intent(this, com.mdex.venusAlpha01a.UartService.class);
         bindService(bindIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
@@ -363,6 +492,17 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         LocalBroadcastManager.getInstance(this).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     *
+     * @brief intenrFilter를 생성하고 값을 설정한는 함수
+     * @details intentFilter를 생성하고 UarService.java에서 각 value를 불러와 Setting 한다.
+     * @param
+     * @return intentFilter
+     * @throws
+     */
+>>>>>>> origin/master
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(com.mdex.venusAlpha01a.UartService.ACTION_GATT_CONNECTED);
@@ -376,6 +516,15 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     public void onStart() {
         super.onStart();
     }
+
+    /**
+     *
+     * @brief 진행중인 서비스 STOP
+     * @details
+     * @param
+     * @return
+     * @throws
+     */
 
     @Override
     public void onDestroy() {
@@ -428,7 +577,18 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         super.onConfigurationChanged(newConfig);
     }
 
+<<<<<<< HEAD
 
+=======
+    /**
+     *
+     * @brief requestCode에 따른 결과 값 도출
+     * @details REQUEST_SELECT_DEVICE -  DeviceListActivity에서 선택된 device의 주소 넘겨 받아 device Connection을 한다.
+     * @param   requestCode, int resultCode, Intent data
+     * @return
+     * @throws
+     */
+>>>>>>> origin/master
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -473,6 +633,17 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     }
 
 
+<<<<<<< HEAD
+=======
+    /**
+     *
+     * @brief
+     * @details
+     * @param
+     * @return
+     * @throws
+     */
+>>>>>>> origin/master
     @Override
     public void onBackPressed() {
         if (mState == UART_PROFILE_CONNECTED) {
@@ -546,15 +717,38 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     Map<String, Object> hmap = null;
 
 
+<<<<<<< HEAD
+=======
+    protected void onRadioClicked(View view){
+        switch (view.getId()){
+            case R.id.RB_MAIN:
+                mBoardSelect = 0; // Main board
+                break;
+            case R.id.RB_SHIELD:
+                mBoardSelect = 1; // Shield board
+                break;
+        }
+    }
+
+>>>>>>> origin/master
     /**
      *
      * @brief App의 화면의 컨트롤들 선언
      * @details App의 화면을 구성하는 컨트롤들을 불러와 각 변수에 선언하여 사용할수 있게 셌팅한다.
+<<<<<<< HEAD
      * @param void
      * @return void
      * @throws
      */
     private void UI_onCreate(){
+=======
+     * @param
+     * @return
+     * @throws
+     */
+
+    private void onCreate_UI(){
+>>>>>>> origin/master
         edtBatteryLevel = (TextView) findViewById(R.id.TV_BatteryLevel);
         edtLastPacketTime = (TextView)findViewById(R.id.TV_CurTime);
 
@@ -613,6 +807,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     /**
      *
      * @brief 변수에 value setting
+<<<<<<< HEAD
      * @details 각 변수에 전달 받은 압력값을 Setting 하고 CSV FIle저장 유무에 따라 데이터를 따라 저장한다.
      * @param void
      * @return void
@@ -622,6 +817,14 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         if(m_PacketParser.isPacketCompleted() == false)
             return;
 
+=======
+     * @details 각 변수에 전달 받은 압력값을 Setting 하고 CSV FIle저장 유무에 따라 데이터를 따르 저장한다.
+     * @param
+     * @return
+     * @throws
+     */
+    private void UI_showParsedData(){
+>>>>>>> origin/master
         // last time packet received
         {
             SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm:ss");
@@ -662,6 +865,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     }
 
 
+<<<<<<< HEAD
     /**
      * @brief   현재의 자세를 태그로 저장한다.
      * @detail  추가로 현재의 자세를 취한 시점의 시간을 저장한다. 이 값은 현재의 자세를 유지할 경우, 몇초간 유지하고 있는 지를 UI에서 보여줄 때 사용된다.
@@ -670,6 +874,13 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
      */
     private void setPostureState(POSTURE_tag posture_state) {
         if (m_PostureState != posture_state) {
+=======
+
+
+    private void setPostureState(POSTURE_tag posture_state){
+        if(m_PostureState != posture_state) {
+            m_isAlarm_2000MS = false;
+>>>>>>> origin/master
             m_PostureOriginTimeMS = elapsedRealtime();
         }
         m_PostureState = posture_state;
@@ -695,14 +906,25 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
 
     /**
+<<<<<<< HEAD
      * @brief UI 화면에 무게 중심을 표시해주는 함수(COM : Center of Mess)
      * @details 센서에서 측정한 압력 값으로 COM 값을 계산한다. 이를 이미지로 화면에 뿌려준다.
+=======
+     *
+     * @brief App의 화면에서 보여지는 UI부분에 해당 값을 출력하는 함수
+     * @details 센서로 부터 압력 값을 전달받는다. 전달 받은 값이 빈 값이면 비어있는 시간과 함께 출력해주고 센서에 값이 들어오면 해당 값과 이미지를 출력해준다.
+>>>>>>> origin/master
      * @param
      * @return
      * @throws
      */
+<<<<<<< HEAD
     private void UI_drawImage(){
         if(m_PacketParser.isSeatOccupied() == false){
+=======
+    private void UI_updateComputedData(){
+        if(m_PacketParser.isPostureValid_Row1() == false){
+>>>>>>> origin/master
             setPostureState(POSTURE_tag.POSTURE_NO_LOG);
             tv_PostureState.setText(String.format("EMPTY, %d sec", getPostureElapsedSecond()));
 
