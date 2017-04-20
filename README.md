@@ -8,10 +8,6 @@ we use BLE 4.0 communication
 
 ================================================================
 
-<div align = "center">
-<img src="https://github.com/iOS10-KIT/Website/blob/master/resources/git/first.png" />
-</div>
-
 노르딕 nrfUART 소스코드 주소
 https://github.com/hubuhubu/Android-nRF-UART
 
