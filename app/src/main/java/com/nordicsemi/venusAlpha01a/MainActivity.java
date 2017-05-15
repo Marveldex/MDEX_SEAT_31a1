@@ -110,8 +110,6 @@ import static android.os.SystemClock.elapsedRealtime;
  *
  */
 
-
-
 public class   MainActivity extends Activity implements RadioGroup.OnCheckedChangeListener {
     private static final int REQUEST_SELECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
@@ -131,8 +129,9 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     ArrayList<String> mlist;
     ArrayAdapter<String> mAdapter;
     ListView mStateList;
-
-
+    private float vector;
+    private String m_Mode_Info;
+    private TextView m_Mode_TxtView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -216,7 +215,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
     }
 
-
     //UART service connected/disconnected
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder rawBinder) {
@@ -297,7 +295,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
                      }
                  });
             }
-            
           
           //*********************//
             if (action.equals(com.mdex.venusAlpha01a.UartService.ACTION_GATT_SERVICES_DISCOVERED)) {
@@ -428,7 +425,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         super.onConfigurationChanged(newConfig);
     }
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -472,7 +468,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-
     @Override
     public void onBackPressed() {
         if (mState == UART_PROFILE_CONNECTED) {
@@ -498,7 +493,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             .show();
         }
     }
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -542,7 +536,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     //  Variables - Save CSV
     Button mSave_Start;
     private boolean mSave_Flag = false;
-    private String positionCSV = null;
+    private String mPosition_Csv = null;
     Map<String, Object> hmap = null;
 
 
@@ -607,6 +601,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
         mSave_Start = (Button)findViewById(R.id.Save_Start);
         tvFilePathName = (TextView)findViewById(R.id.TV_FILEPATH);
+        m_Mode_TxtView = (TextView)findViewById(R.id.MODE_INFO);
 
     }
 
@@ -621,6 +616,22 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     private void UI_updateTextView(){
         if(m_PacketParser.isPacketCompleted() == false)
             return;
+
+        //mode check  M,S --> Venus   L,R --> Seat
+        m_Mode_Info = PacketParser.Mode_Info;
+
+        if(m_Mode_Info == "M" || m_Mode_Info == "S"){
+
+            m_Mode_TxtView.setText("본 어플 실행시 보드의 딥스위치B를 ON하세요");
+            //toast 보여주기
+            Toast toast = Toast.makeText(getApplicationContext(), "딥스위치 B를 ON 하세요", Toast.LENGTH_LONG);
+            toast.show();
+
+        }else if(m_Mode_Info == "L" || m_Mode_Info == "R"){
+
+            m_Mode_TxtView.setText("");
+
+        }
 
         // last time packet received
         {
@@ -661,7 +672,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         }
     }
 
-
     /**
      * @brief   현재의 자세를 태그로 저장한다.
      * @detail  추가로 현재의 자세를 취한 시점의 시간을 저장한다. 이 값은 현재의 자세를 유지할 경우, 몇초간 유지하고 있는 지를 UI에서 보여줄 때 사용된다.
@@ -692,7 +702,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     private long getPostureElapsedSecond(){
         return (elapsedRealtime() - m_PostureOriginTimeMS) / 1000;
     }
-
 
     /**
      * @brief UI 화면에 무게 중심을 표시해주는 함수(COM : Center of Mess)
@@ -777,7 +786,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             }
         }
 
-
         //  UI draw left line of COC
         {
             //  calculate COC - left
@@ -795,7 +803,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         }
     }
 
-
     private void UI_CSV_makeCSVdata() {
         if(m_PacketParser.isPacketCompleted() == false)
             return;
@@ -804,16 +811,28 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         {
             int cell_index = 0;
 
+            long now = System.currentTimeMillis();
+            Date date = new Date(now);
+            SimpleDateFormat sdfNow = new SimpleDateFormat("yyyyMMdd_HHmmss");
+            String formatDate = sdfNow.format(date);
+
             hmap = new HashMap<String, Object>();
 
             //  Row 0
             for (cell_index = 0 ; cell_index < PacketParser.def_CELL_COUNT_ROW0 ; cell_index++){
                 String nPoint = tvaChairCells_Row0[cell_index].getText().toString();
 
-                if(positionCSV==null){
-                    positionCSV =  "0_" + cell_index + "," + nPoint + ",";
+                if(mPosition_Csv==null){
+                    mPosition_Csv = formatDate +"," +  "0_" + cell_index + "," + nPoint + ",";
+
                 }else{
-                    positionCSV = positionCSV + "0_" + cell_index + "," + nPoint + ",";
+
+                    if(cell_index==0){
+                        mPosition_Csv =  mPosition_Csv + formatDate +"," +  "0_" + cell_index + "," + nPoint + ",";
+
+                    }else{
+                        mPosition_Csv =  mPosition_Csv  + "0_" + cell_index + "," + nPoint + ",";
+                    }
                 }
             }
 
@@ -821,7 +840,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             for (cell_index = 0 ; cell_index < PacketParser.def_CELL_COUNT_ROW1 ; cell_index++){
                 String nPoint1 = tvaChairCells_Row1[cell_index].getText().toString();
 
-                positionCSV = positionCSV + "1_" + cell_index + "," + nPoint1 + ",";
+                mPosition_Csv = mPosition_Csv + "1_" + cell_index + "," + nPoint1 + ",";
             }
 
             //  Row 2
@@ -829,16 +848,15 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
                 String nPoint2 = tvaChairCells_Row2[cell_index].getText().toString();
 
                 if(cell_index < 9 ){
-                    positionCSV = positionCSV + "2_" + cell_index + "," + nPoint2 + ",";
+                    mPosition_Csv = mPosition_Csv + "2_" + cell_index + "," + nPoint2 + ",";
 
                 }else{
-                    positionCSV = positionCSV + "2_" + cell_index + "," + nPoint2 + "\r\n";
+                    mPosition_Csv = mPosition_Csv + "2_" + cell_index + "," + nPoint2 + "\r\n";
                 }
             }
 
         }
     }
-
 
     /**
      *
@@ -867,14 +885,16 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         }
     }
 
-    private void UI_list(float pcom, float Pleft, float Pright){
+    private void UI_list(float coord_com, float coord_coc_left, float coord_coc_right){
 
         //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mess : 0 \n lateral vector : 0.0"/>
         mlist = new ArrayList<String>();
-        mlist.add("contour, left edge = " + String.format("%1.1f",Pleft) +"//" + " right edge = " + Pright);
-        mlist.add("center of contour = " + String.format("%1.1f",(Pleft + Pright/2)));
-        mlist.add("center of mess = " + String.format("%1.1f",pcom));
-        mlist.add("lateral Vector = " + (pcom - (Pleft + Pright/2)));
+        mlist.add("contour, left edge = " + String.format("%1.1f",coord_coc_left) +"//" + " right edge = " + coord_coc_right);
+        mlist.add("center of contour = " + String.format("%1.3f",((coord_coc_left + coord_coc_right)/2)));
+        mlist.add("center of mess = " + String.format("%1.3f",coord_com));
+        //mlist.add("lateral Vector = " + (coord_com - ((coord_coc_left + coord_coc_right)/2)));
+        vector = (coord_com - ((coord_coc_left + coord_coc_right)/2));
+        mlist.add("lateral Vector = " + String.format("%1.3f", vector));
 
         //mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mlist);
 
@@ -907,12 +927,31 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             if(mlist.get(position).substring(0, 7).equals("contour"))
                 imageView.setImageResource(R.drawable.coc_sero_left);
             else if(mlist.get(position).substring(0, 17).equals("center of contour"))
-                imageView.setImageResource(R.drawable.test_sero);
+                imageView.setImageResource(R.drawable.center_of_contuor);
             else if(mlist.get(position).substring(0, 14).equals("center of mess"))
                 imageView.setImageResource(R.drawable.test_sero);
-            else if(mlist.get(position).substring(0, 7).equals("lateral"))
-                imageView.setImageResource(R.drawable.background_posture);
+            else if(mlist.get(position).substring(0, 7).equals("lateral")){
+                //imageView.setImageResource(R.drawable.vector_center);
+                if(  - 0.7< vector && vector < -0.3){
 
+                    imageView.setImageResource(R.drawable.vector_left);
+
+                }else if(vector <= - 0.7){
+
+                    imageView.setImageResource(R.drawable.vector_big_left);
+
+                }else if( 0.3 < vector && vector < 0.7 ){
+
+                    imageView.setImageResource(R.drawable.vector_right);
+
+                }else if(vector >= 0.7){
+
+                    imageView.setImageResource(R.drawable.vector_big_right);
+                }else{
+
+                    imageView.setImageResource(R.drawable.vector_center);
+                }
+            }
 
             TextView textView = (TextView)v.findViewById(R.id.textView);
             textView.setText(mlist.get(position));
@@ -935,7 +974,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
         long now = System.currentTimeMillis();
         Date date = new Date(now);
-        SimpleDateFormat sdfNow = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat sdfNow = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String formatDate = sdfNow.format(date);
 
         try{
@@ -945,12 +984,12 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
                 file.createNewFile();
             }
 
-            PrintWriter csvWriter;
-            csvWriter = new  PrintWriter(new FileWriter(file,true));
+            PrintWriter csv_writer;
+            csv_writer = new  PrintWriter(new FileWriter(file,true));
 
-            csvWriter.print(positionCSV);
-            //csvWriter.print("\r\n");
-            csvWriter.close();
+            csv_writer.print(mPosition_Csv);
+            //csv_writer.print("\r\n");
+            csv_writer.close();
 
             tvFilePathName.setText("File path : /mnt/sdcard/Download/" + formatDate + ".csv");
         }

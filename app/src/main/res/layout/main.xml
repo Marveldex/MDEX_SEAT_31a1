@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="160dp"
         android:layout_weight="0.31"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <RelativeLayout
             android:id="@+id/RelativeLayout1"
@@ -282,14 +282,23 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <Space
+                android:id="@+id/Mid_Space2"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:layout_below="@+id/LL_CHAIR_CELL_ARRAY"
+                android:layout_toEndOf="@+id/sendText"
+                android:layout_marginStart="12dp" />
+
 
             <RelativeLayout
                 android:id="@+id/RelativeLayout_COM"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_weight="4.11"
+                android:orientation="horizontal"
                 android:layout_below="@+id/LL_CHAIR_CELL_ARRAY"
-                android:orientation="horizontal">
+                android:layout_alignParentStart="true">
 
                 <Space
                     android:id="@+id/space_COM"
@@ -329,25 +338,45 @@
                     android:id="@+id/iv_COC_SERO_RIGHT"
                     android:layout_width="5dp"
                     android:layout_height="match_parent"
-                                                                              android:layout_toEndOf="@+id/space_COC_RIGHT"
+                    android:layout_toEndOf="@+id/space_COC_RIGHT"
                     android:contentDescription="iv_com_seroline"
                     android:src="@drawable/coc_sero_right" />
+
             </RelativeLayout>
+
+            <Space
+                android:id="@+id/Mid_Space"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:layout_below="@+id/RelativeLayout_COM" />
 
             <ListView
                 android:id="@+id/TV_SEAT_LOG"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_below="@+id/RelativeLayout_COM"
+                android:layout_height="150dp"
+                android:layout_below="@+id/Mid_Space"
                 android:textColor="@color/whitegrey"
-                android:textSize = "7px"
-                android:text = " contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mess : 0 \n lateral vector : 0.0"/>
+                android:textSize="7px" />
+
+            <TextView
+                android:id="@+id/MODE_INFO"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_below="@+id/TV_SEAT_LOG"/>
+            <Space
+                android:id="@+id/Mid_Space3"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:layout_below="@+id/TV_SEAT_LOG" />
 
             <TextView
                 android:id="@+id/TV_POSTURE_LATERAL"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:layout_below="@+id/TV_SEAT_LOG"
+                android:layout_below="@+id/MODE_INFO"
                 android:background="@drawable/background_posture"
                 android:gravity="center"
                 android:text="@string/ui_posture_lateral"
