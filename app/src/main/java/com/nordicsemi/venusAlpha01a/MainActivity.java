@@ -76,6 +76,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.R.id.button3;
 import static android.R.id.icon1;
 import static android.R.id.list;
 import static android.os.SystemClock.elapsedRealtime;
@@ -132,6 +133,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     private float vector;
     private String m_Mode_Info;
     private TextView m_Mode_TxtView;
+    private int toast_flag = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -182,6 +184,9 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         				}
         			}
                 }
+
+                toast_flag = 0;
+
             }
         });
 
@@ -332,7 +337,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
                              // update sensor data to TextView
                              UI_updateTextView();
 
-                             // draw center of mess image
+                             // draw center of mass image
                              UI_drawImage();
 
                              // save CSV file
@@ -619,17 +624,23 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
         //mode check  M,S --> Venus   L,R --> Seat
         m_Mode_Info = PacketParser.Mode_Info;
+        Toast toast = Toast.makeText(getApplicationContext(), "딥스위치 B를 ON 하세요", Toast.LENGTH_SHORT);
 
         if(m_Mode_Info == "M" || m_Mode_Info == "S"){
 
             m_Mode_TxtView.setText("본 어플 실행시 보드의 딥스위치B를 ON하세요");
             //toast 보여주기
-            Toast toast = Toast.makeText(getApplicationContext(), "딥스위치 B를 ON 하세요", Toast.LENGTH_LONG);
-            toast.show();
+
+            if(toast_flag == 0 ){
+                toast.show();
+                toast_flag = toast_flag + 1;
+            }
+
 
         }else if(m_Mode_Info == "L" || m_Mode_Info == "R"){
 
             m_Mode_TxtView.setText("");
+            toast.cancel();
 
         }
 
@@ -887,11 +898,11 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
     private void UI_list(float coord_com, float coord_coc_left, float coord_coc_right){
 
-        //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mess : 0 \n lateral vector : 0.0"/>
+        //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral vector : 0.0"/>
         mlist = new ArrayList<String>();
         mlist.add("contour, left edge = " + String.format("%1.1f",coord_coc_left) +"//" + " right edge = " + coord_coc_right);
         mlist.add("center of contour = " + String.format("%1.3f",((coord_coc_left + coord_coc_right)/2)));
-        mlist.add("center of mess = " + String.format("%1.3f",coord_com));
+        mlist.add("center of mass = " + String.format("%1.3f",coord_com));
         //mlist.add("lateral Vector = " + (coord_com - ((coord_coc_left + coord_coc_right)/2)));
         vector = (coord_com - ((coord_coc_left + coord_coc_right)/2));
         mlist.add("lateral Vector = " + String.format("%1.3f", vector));
@@ -928,7 +939,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
                 imageView.setImageResource(R.drawable.coc_sero_left);
             else if(mlist.get(position).substring(0, 17).equals("center of contour"))
                 imageView.setImageResource(R.drawable.center_of_contuor);
-            else if(mlist.get(position).substring(0, 14).equals("center of mess"))
+            else if(mlist.get(position).substring(0, 14).equals("center of mass"))
                 imageView.setImageResource(R.drawable.test_sero);
             else if(mlist.get(position).substring(0, 7).equals("lateral")){
                 //imageView.setImageResource(R.drawable.vector_center);
