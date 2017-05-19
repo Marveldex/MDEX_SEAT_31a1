@@ -41,9 +41,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -134,6 +136,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     private String m_Mode_Info;
     private TextView m_Mode_TxtView;
     private int toast_flag = 0;
+    RelativeLayout ui_coc_com_layout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -154,7 +157,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         btnConnectDisconnect=(Button) findViewById(R.id.btn_select);
         btnSend=(Button) findViewById(R.id.sendButton);
         edtMessage = (EditText) findViewById(R.id.sendText);
-
+        ui_coc_com_layout = (RelativeLayout)findViewById(R.id.RelativeLayout_COM);
 
         UI_onCreate();
 
@@ -513,8 +516,11 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     Space sp_COM_sero;
     Space sp_COC_left;
     Space sp_COC_right;
+    Space sp_COC;
     ImageView iv_COM_bar;
+    ImageView iv_COC;
     int nImageCOM_offset = 0;
+    int nImageCOC_offset = 0;
     TextView tvFilePathName;
 
 
@@ -543,7 +549,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     private boolean mSave_Flag = false;
     private String mPosition_Csv = null;
     Map<String, Object> hmap = null;
-
 
     /**
      *
@@ -601,6 +606,8 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         sp_COC_left = (Space)findViewById(R.id.space_COC_LEFT);
         sp_COC_right = (Space)findViewById(R.id.space_COC_RIGHT);
         iv_COM_bar = (ImageView)findViewById(R.id.iv_COM_SERO);
+        iv_COC = (ImageView)findViewById(R.id.iv_coc);
+        sp_COC = (Space)findViewById(R.id.space_COC);
 
         m_PostureState = POSTURE_tag.POSTURE_NO_LOG;
 
@@ -624,11 +631,11 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
         //mode check  M,S --> Venus   L,R --> Seat
         m_Mode_Info = PacketParser.Mode_Info;
-        Toast toast = Toast.makeText(getApplicationContext(), "딥스위치 B를 ON 하세요", Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.ui_dip_switch_toast), Toast.LENGTH_SHORT);
 
         if(m_Mode_Info == "M" || m_Mode_Info == "S"){
 
-            m_Mode_TxtView.setText("본 어플 실행시 보드의 딥스위치B를 ON하세요");
+            m_Mode_TxtView.setText(getString(R.string.ui_dip_switch_txt));
             //toast 보여주기
 
             if(toast_flag == 0 ){
@@ -641,7 +648,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
             m_Mode_TxtView.setText("");
             toast.cancel();
-
         }
 
         // last time packet received
@@ -724,11 +730,26 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     private void UI_drawImage(){
         if(m_PacketParser.isSeatOccupied() == false){
             setPostureState(POSTURE_tag.POSTURE_NO_LOG);
-            tv_PostureState.setText(String.format("EMPTY, %d sec", getPostureElapsedSecond()));
+            tv_PostureState.setText( "POSTURE : "+ String.format("EMPTY, %d sec", getPostureElapsedSecond()));
+
+            //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral vector : 0.0"/>
+            mlist = new ArrayList<String>();
+            mlist.add(getString(R.string.ui_state_leftside)+ " = 0  // " + getString(R.string.ui_state_rightside) +" =  0");
+            mlist.add(getString(R.string.ui_state_coc) + " =  0" );
+            mlist.add(getString(R.string.ui_state_com)+ " =  0");
+            //mlist.add("lateral Vector = " + (coord_com - ((coord_coc_left + coord_coc_right)/2)));
+            mlist.add(getString(R.string.ui_state_vector) + "=  0");
+
+
+            mAdapter = new CustomAdapter(this, 0, mlist);
+
+
+            mStateList = (ListView)findViewById(R.id.TV_SEAT_LOG);
+
+            mStateList.setAdapter(mAdapter);
 
             return;
         }
-
 
         //--------------------------------------------------------------------
         //  Finding coordinate back data to draw line
@@ -738,26 +759,37 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         int ui_cell_width =  tvaChairCells_Row1[0].getMeasuredWidth();
         int ui_coc_area_size = ui_cell_width * PacketParser.def_CELL_COUNT_ROW1;
 
+
+
         //  UI - finding left margin of Row1 textview array
         int[] locations = new int[2];
         tvaChairCells_Row1[0].getLocationOnScreen(locations);
         int ui_left_of_most_left_cell = locations[0];
         int ui_left_margin = ui_coc_area_size / 2 + ui_left_of_most_left_cell;
 
-        //  UI - half of imageview "COM"
+        //  UI - half of imageview "COM, coc"
         nImageCOM_offset = iv_COM_bar.getMeasuredWidth() / 2;
+        nImageCOC_offset = iv_COC.getMeasuredWidth()/2;
+
+        //ui_coc_com_layout.setLayoutParams(new RelativeLayout(986, 80));
 
         //  find COM coordinate
         float proportion_com_x  = m_PacketParser.getLateralCOM_Row1();
         int ui_com_x            = ui_left_margin + (int)(ui_cell_width * proportion_com_x) - nImageCOM_offset;
 
+        //ui_com_x = 100;
+
         //  find COC left coordinate
         float proportion_coc_left   = m_PacketParser.getLateralCOC_left_Row1();
-        int ui_coc_left             = ui_left_margin + (int)(ui_cell_width * proportion_coc_left);
+        int ui_coc_left             = ui_left_margin + (int)(ui_cell_width * proportion_coc_left) - 20;
 
         //  find COC right coordinate
         float proportion_coc_right  = m_PacketParser.getLateralCOC_right_Row1();
-        int ui_coc_right            = ui_left_margin + (int)(ui_cell_width * proportion_coc_right);
+        int ui_coc_right            = ui_left_margin + (int)(ui_cell_width * proportion_coc_right) - 10;
+
+        int ui_coc_x = ((ui_coc_left + ui_coc_right) / 2) - nImageCOC_offset + 14;
+
+        //ui_coc_x = 100;
 
         UI_list(proportion_com_x, proportion_coc_left,proportion_coc_right );
 
@@ -811,6 +843,11 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)sp_COC_right.getLayoutParams();
             params.setMargins(0, 0, ui_coc_right, 0); //substitute parameters for left, top, right, bottom
             sp_COC_right.setLayoutParams(params);
+        }
+        {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)sp_COC.getLayoutParams();
+            params.setMargins(0, 0, ui_coc_x, 0); //subst.itute parameters for left, top, right, bottom
+            sp_COC.setLayoutParams(params);
         }
     }
 
@@ -900,12 +937,12 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
         //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral vector : 0.0"/>
         mlist = new ArrayList<String>();
-        mlist.add("contour, left edge = " + String.format("%1.1f",coord_coc_left) +"//" + " right edge = " + coord_coc_right);
-        mlist.add("center of contour = " + String.format("%1.3f",((coord_coc_left + coord_coc_right)/2)));
-        mlist.add("center of mass = " + String.format("%1.3f",coord_com));
+        mlist.add(getString(R.string.ui_state_leftside)+ " = " + String.format("%1.1f",coord_coc_left) +"//" + getString(R.string.ui_state_rightside)+ " = " + coord_coc_right);
+        mlist.add(getString(R.string.ui_state_coc) + " = " + String.format("%1.3f",((coord_coc_left + coord_coc_right)/2)));
+        mlist.add(getString(R.string.ui_state_com) +" = " + String.format("%1.3f",coord_com));
         //mlist.add("lateral Vector = " + (coord_com - ((coord_coc_left + coord_coc_right)/2)));
         vector = (coord_com - ((coord_coc_left + coord_coc_right)/2));
-        mlist.add("lateral Vector = " + String.format("%1.3f", vector));
+        mlist.add(getString(R.string.ui_state_vector) + " = " + String.format("%1.3f", vector));
 
         //mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mlist);
 
@@ -915,7 +952,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         mStateList = (ListView)findViewById(R.id.TV_SEAT_LOG);
 
         mStateList.setAdapter(mAdapter);
-
     }
 
     private class CustomAdapter extends ArrayAdapter<String>{
@@ -935,13 +971,13 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             ImageView imageView = (ImageView)v.findViewById(R.id.imageView);
 
             // 리스트뷰의 아이템에 이미지를 변경한다.
-            if(mlist.get(position).substring(0, 7).equals("contour"))
-                imageView.setImageResource(R.drawable.coc_sero_left);
-            else if(mlist.get(position).substring(0, 17).equals("center of contour"))
-                imageView.setImageResource(R.drawable.center_of_contuor);
-            else if(mlist.get(position).substring(0, 14).equals("center of mass"))
-                imageView.setImageResource(R.drawable.test_sero);
-            else if(mlist.get(position).substring(0, 7).equals("lateral")){
+            if(mlist.get(position).substring(0, 7).equals("Contour"))
+                imageView.setImageResource(R.drawable.total);
+            else if(mlist.get(position).substring(0, 17).equals("Center of Contour"))
+                imageView.setImageResource(R.drawable.coc);
+            else if(mlist.get(position).substring(0, 14).equals("Center of Mass"))
+                imageView.setImageResource(R.drawable.com);
+            else if(mlist.get(position).substring(0, 7).equals("Lateral")){
                 //imageView.setImageResource(R.drawable.vector_center);
                 if(  - 0.7< vector && vector < -0.3){
 
@@ -963,11 +999,16 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
                     imageView.setImageResource(R.drawable.vector_center);
                 }
             }
+           /* else if(mlist.get(position).substring(0, 7).equals("Lateral")){
+
+            }*/
 
             TextView textView = (TextView)v.findViewById(R.id.textView);
             textView.setText(mlist.get(position));
 
             final String text = mlist.get(position);
+
+            //tvFilePathName.setText(text);
 
             return v;
         }

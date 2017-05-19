@@ -275,12 +275,12 @@ public class PacketParser {
 
     public static float getLateralCOC_right_Row1() {
         int cell_index = 0;
-        for(cell_index = (def_CELL_COUNT_ROW1 - 1) ; 0 <= cell_index ; cell_index--) {
+        for(cell_index = (def_CELL_COUNT_ROW1 - 1) ; 0 < cell_index ; cell_index--) {
             if(def_THRESHOLD_VALID_LOWEST < nPressureValue_Row1[cell_index]) {
                 break;
             }
         }
-        if(cell_index == 0)
+        if(cell_index == -1)
             cell_index = def_CELL_COUNT_ROW1 - 1;
 
         float coord_right = (float)cell_index - 7.0F; // 7.0F is center point of row 1

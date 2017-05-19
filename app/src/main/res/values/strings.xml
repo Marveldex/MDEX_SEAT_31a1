@@ -22,7 +22,7 @@
   -->
 <resources>
 
-    <string name="app_name">Venus SDK (V.0.2-170405)</string>
+    <string name="app_name">SEAT SDK (V.0.2)</string>
     <string name="popup_title">Quit Health seat</string>
     <string name="device">Device:</string>
     <string name="no_device">&lt;Select a device&gt;</string>
@@ -81,5 +81,13 @@
     <string name="fmt_start_save">Save to CSV</string>
     <string name="fmt_stop_save">Stop save</string>
     <string name="fmt_save_msg">Save successfully</string>
+    <string name="ui_state_coc">Center of Contour</string>
+    <string name="ui_state_leftside">Contour, left edge</string>
+    <string name="ui_state_rightside">right edge</string>
+    <string name="ui_state_com">Center of Mass</string>
+    <string name="ui_state_vector">Lateral vector(COM - COC)</string>
+    <string name="ui_dip_switch_txt">"본 어플 실행시 보드의 딥스위치B를 ON하세요"</string>
+    <string name="ui_dip_switch_toast">"딥스위치 B를 ON 하세요"</string>
+    <string name="ui_App_Title">MDEX_SEAT_31a1</string>
 
 </resources>

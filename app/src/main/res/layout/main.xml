@@ -294,11 +294,27 @@
             <RelativeLayout
                 android:id="@+id/RelativeLayout_COM"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="80dp"
                 android:layout_weight="4.11"
                 android:orientation="horizontal"
                 android:layout_below="@+id/LL_CHAIR_CELL_ARRAY"
                 android:layout_alignParentStart="true">
+
+                <Space
+                    android:id="@+id/space_COC"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true" />
+
+                <ImageView
+                    android:id="@+id/iv_coc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_above="@+id/iv_COM_SERO"
+                    android:src="@drawable/coc"
+                    android:layout_toEndOf="@+id/space_COC"
+                    android:layout_alignParentTop="true" />
+
 
                 <Space
                     android:id="@+id/space_COM"
@@ -309,10 +325,11 @@
                 <ImageView
                     android:id="@+id/iv_COM_SERO"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="40dp"
                     android:layout_toEndOf="@+id/space_COM"
+                    android:layout_alignParentBottom="true"
                     android:contentDescription="iv_com_seroline"
-                    android:src="@drawable/test_sero" />
+                    android:src="@drawable/com" />
 
                 <Space
                     android:id="@+id/space_COC_LEFT"
@@ -322,8 +339,8 @@
 
                 <ImageView
                     android:id="@+id/iv_COC_SERO_LEFT"
-                    android:layout_width="5dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="14dp"
+                    android:layout_height="80dp"
                     android:layout_toEndOf="@+id/space_COC_LEFT"
                     android:contentDescription="iv_com_seroline"
                     android:src="@drawable/coc_sero_left" />
@@ -336,8 +353,8 @@
 
                 <ImageView
                     android:id="@+id/iv_COC_SERO_RIGHT"
-                    android:layout_width="5dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="14dp"
+                    android:layout_height="80dp"
                     android:layout_toEndOf="@+id/space_COC_RIGHT"
                     android:contentDescription="iv_com_seroline"
                     android:src="@drawable/coc_sero_right" />
@@ -370,7 +387,8 @@
                 android:id="@+id/Mid_Space3"
                 android:layout_width="match_parent"
                 android:layout_height="15dp"
-                android:layout_below="@+id/TV_SEAT_LOG" />
+                android:layout_below="@+id/TV_SEAT_LOG"
+                android:layout_alignParentStart="true" />
 
             <TextView
                 android:id="@+id/TV_POSTURE_LATERAL"
@@ -390,7 +408,6 @@
                 android:layout_below="@+id/TV_POSTURE_LATERAL"
                 android:background="@drawable/background_posture"
                 android:gravity="center"
-                android:text="@string/ui_posture_longitudinal"
                 android:textColor="@color/yellow"
                 android:textSize="16sp" />
 
