@@ -732,6 +732,8 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             setPostureState(POSTURE_tag.POSTURE_NO_LOG);
             tv_PostureState.setText( "POSTURE : "+ String.format("EMPTY, %d sec", getPostureElapsedSecond()));
 
+            UI_LEDWORK(0, 1);
+
             //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral vector : 0.0"/>
             mlist = new ArrayList<String>();
             mlist.add(getString(R.string.ui_state_leftside)+ " = 0  // " + getString(R.string.ui_state_rightside) +" =  0");
@@ -792,6 +794,11 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         //ui_coc_x = 100;
 
         UI_list(proportion_com_x, proportion_coc_left,proportion_coc_right );
+
+
+        //착석 방향에 따른 led 기능
+        UI_LEDWORK(proportion_com_x,0);
+
 
         //--------------------------------------------------------------------
         //  Draw Images - COM, Left COC, Right COC
@@ -931,6 +938,58 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             mSave_Start.setText(getString(R.string.fmt_start_save));
             Toast.makeText(this, getString(R.string.fmt_save_msg), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void UI_LEDWORK(float com_led, int led_flag){
+
+        String msg_led[] = new String[2];
+
+        if(led_flag == 0){
+
+            if(com_led < - 0.4){
+                //왼쪽기울림 -- left led on
+
+                msg_led[0] = "turn on left";
+                msg_led[1] = "turn off right";
+
+            }else if(com_led >= -0.4 && com_led <= 0.4){
+                //정상착석  - left/ right led on
+
+                msg_led[0] = "turn on left";
+                msg_led[1] = "turn on right";
+
+            }else if(com_led > 0.4){
+                //오른쪽 기울림 - right led on
+                msg_led[0] = "turn off left";
+                msg_led[1] = "turn on right";
+
+            }
+        }else if(led_flag == 1){
+
+            msg_led[0] = "turn off left";
+            msg_led[1] = "turn off right";
+        }
+
+        int msg_cnt;
+        String send_msg = null;
+
+        for(msg_cnt = 0;  msg_cnt < 2; msg_cnt++){
+
+            send_msg = msg_led[msg_cnt];
+
+            byte[] value;
+            try {
+                //send data to service
+                value = send_msg.getBytes("UTF-8");
+                mService.writeRXCharacteristic(value);
+                edtMessage.setText("");
+            } catch (UnsupportedEncodingException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+
     }
 
     private void UI_list(float coord_com, float coord_coc_left, float coord_coc_right){
