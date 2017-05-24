@@ -132,7 +132,8 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     ArrayList<String> mlist;
     ArrayAdapter<String> mAdapter;
     ListView mStateList;
-    private float vector;
+    
+    private float m_LateralVector;
     private String m_Mode_Info;
     private TextView m_Mode_TxtView;
     private int toast_flag = 0;
@@ -734,7 +735,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
             UI_LEDWORK(0, 1);
 
-            //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral vector : 0.0"/>
+            //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral m_LateralVector : 0.0"/>
             mlist = new ArrayList<String>();
             mlist.add(getString(R.string.ui_state_leftside)+ " = 0  // " + getString(R.string.ui_state_rightside) +" =  0");
             mlist.add(getString(R.string.ui_state_coc) + " =  0" );
@@ -791,13 +792,14 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
         int ui_coc_x = ((ui_coc_left + ui_coc_right) / 2) - nImageCOC_offset + 14;
 
-        //ui_coc_x = 100;
+        m_LateralVector = (proportion_com_x - ((proportion_coc_left + proportion_coc_right)/2));
 
-        UI_list(proportion_com_x, proportion_coc_left,proportion_coc_right );
+
+        UI_list(proportion_com_x, proportion_coc_left,proportion_coc_right, m_LateralVector );
 
 
         //착석 방향에 따른 led 기능
-        UI_LEDWORK(proportion_com_x,0);
+        UI_LEDWORK(m_LateralVector,0);
 
 
         //--------------------------------------------------------------------
@@ -813,25 +815,25 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             sp_COM_sero.setLayoutParams(params);
 
 
-            if(proportion_com_x < -1.0F){
-                tv_PostureState.setText(String.format("LEFT - BAD (%1.3f), %d sec", proportion_com_x, getPostureElapsedSecond()));
+            if(m_LateralVector < -1.0F){
+                tv_PostureState.setText(String.format("POSTURE : LEFT - BAD (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_LEFT_BAD);
 
             }
-            else if(proportion_com_x < -0.4F){
-                tv_PostureState.setText(String.format("LEFT (%1.3f), %d sec", proportion_com_x, getPostureElapsedSecond()));
+            else if(m_LateralVector < -0.4F){
+                tv_PostureState.setText(String.format("POSTURE : LEFT (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_LEFT);
             }
-            else if(proportion_com_x < 0.4F){
-                tv_PostureState.setText(String.format("CENTER (%1.3f), %d sec", proportion_com_x, getPostureElapsedSecond()));
+            else if(m_LateralVector < 0.4F){
+                tv_PostureState.setText(String.format("POSTURE : CENTER (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_CENTER);
             }
-            else if(proportion_com_x < 1.0F){
-                tv_PostureState.setText(String.format("RIGHT (%1.3f), %d sec", proportion_com_x, getPostureElapsedSecond()));
+            else if(m_LateralVector < 1.0F){
+                tv_PostureState.setText(String.format("POSTURE : RIGHT (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_RIGHT);
             }
             else {
-                tv_PostureState.setText(String.format("RIGHT - BAD (%1.3f), %d sec", proportion_com_x, getPostureElapsedSecond()));
+                tv_PostureState.setText(String.format("POSTURE : RIGHT - BAD (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_RIGHT_BAD);
             }
         }
@@ -992,24 +994,18 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
     }
 
-    private void UI_list(float coord_com, float coord_coc_left, float coord_coc_right){
+    private void UI_list(float coord_com, float coord_coc_left, float coord_coc_right, float coord_lateral_vector){
 
-        //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral vector : 0.0"/>
+        //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral m_LateralVector : 0.0"/>
         mlist = new ArrayList<String>();
         mlist.add(getString(R.string.ui_state_leftside)+ " = " + String.format("%1.1f",coord_coc_left) +"//" + getString(R.string.ui_state_rightside)+ " = " + coord_coc_right);
         mlist.add(getString(R.string.ui_state_coc) + " = " + String.format("%1.3f",((coord_coc_left + coord_coc_right)/2)));
         mlist.add(getString(R.string.ui_state_com) +" = " + String.format("%1.3f",coord_com));
-        //mlist.add("lateral Vector = " + (coord_com - ((coord_coc_left + coord_coc_right)/2)));
-        vector = (coord_com - ((coord_coc_left + coord_coc_right)/2));
-        mlist.add(getString(R.string.ui_state_vector) + " = " + String.format("%1.3f", vector));
-
-        //mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mlist);
+        mlist.add(getString(R.string.ui_state_vector) + " = " + String.format("%1.3f", coord_lateral_vector));
 
         mAdapter = new CustomAdapter(this, 0, mlist);
 
-
         mStateList = (ListView)findViewById(R.id.TV_SEAT_LOG);
-
         mStateList.setAdapter(mAdapter);
     }
 
@@ -1038,19 +1034,19 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
                 imageView.setImageResource(R.drawable.com);
             else if(mlist.get(position).substring(0, 7).equals("Lateral")){
                 //imageView.setImageResource(R.drawable.vector_center);
-                if(  - 0.7< vector && vector < -0.3){
+                if(  - 0.7< m_LateralVector && m_LateralVector < -0.3){
 
                     imageView.setImageResource(R.drawable.vector_left);
 
-                }else if(vector <= - 0.7){
+                }else if(m_LateralVector <= - 0.7){
 
                     imageView.setImageResource(R.drawable.vector_big_left);
 
-                }else if( 0.3 < vector && vector < 0.7 ){
+                }else if( 0.3 < m_LateralVector && m_LateralVector < 0.7 ){
 
                     imageView.setImageResource(R.drawable.vector_right);
 
-                }else if(vector >= 0.7){
+                }else if(m_LateralVector >= 0.7){
 
                     imageView.setImageResource(R.drawable.vector_big_right);
                 }else{
