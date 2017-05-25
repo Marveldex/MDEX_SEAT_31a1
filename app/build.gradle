@@ -3,7 +3,7 @@ android {
     compileSdkVersion 18
     buildToolsVersion '25.0.0'
     defaultConfig {
-        applicationId 'com.marveldex.venusAlpha01a'
+        applicationId 'com.marveldex.seat31'
         minSdkVersion 18
         targetSdkVersion 18
     }
