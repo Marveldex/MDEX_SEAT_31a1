@@ -16,17 +16,20 @@ Main UI
 <img src="https://github.com/Marveldex/MDEX_SEAR_31a1/blob/master/Image/UI.png" />
 </div>
 
+
+Protocol
+<div align = "center">
+<img src="https://github.com/Marveldex/MDEX_SEAR_31a1/blob/master/Image/protocol_1.png" />
+</div>
+
 Sensor_Number
 <div align = "center">
 <img src="https://github.com/Marveldex/MDEX_SEAR_31a1/blob/master/Image/seat_numbers.png" />
 </div>
 
-
-Protocol
 <div align = "center">
-<img src="https://github.com/Marveldex/MDEX_SEAR_31a1/blob/master/Image/protocol.png" />
+<img src="https://github.com/Marveldex/MDEX_SEAR_31a1/blob/master/Image/protocol_2.png" />
 </div>
-
 
 
 ### Note
