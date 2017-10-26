@@ -5,6 +5,10 @@ package com.marveldex.seat31;
  */
 
 
+import android.util.Log;
+
+import static android.os.SystemClock.elapsedRealtime;
+
 /**
  *
  * @details 압력세서로부터 전달 받은 데이터를 처리하여 직관적인 값으로 변환하고 사용할 변수에 Setting
@@ -43,6 +47,8 @@ public class PacketParser {
 
     public static String textHexaMain = " ";
     public static String textHexaShield = " ";
+
+    int log_packet_x10_count = 0;
 
 
     public PacketParser(){
@@ -89,6 +95,7 @@ public class PacketParser {
 
             m_isPacketCompleted = false;
             Mode_Info = "M";
+
         }
         else if( packet_data_32bit[0] == 'S') {
             textHexaShield = String.format("Sh: %3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d",
@@ -98,6 +105,7 @@ public class PacketParser {
 
             m_isPacketCompleted = true;
             Mode_Info = "S";
+
 
         }else if(packet_data_32bit[0] == 'L') {
 
@@ -109,6 +117,7 @@ public class PacketParser {
 
             m_isPacketCompleted = false;
             Mode_Info = "L";
+            MainActivity.cnt_m++;
 
         }else if(packet_data_32bit[0] == 'R') {
 
@@ -119,12 +128,22 @@ public class PacketParser {
 
             m_isPacketCompleted = true;
             Mode_Info = "R";
+            MainActivity.cnt_s++;
 
         }
 
         //  3) Reorder sensor sequence after last packet ('S') arrived.
         if( m_isPacketCompleted == true) {
             reorderSensorSequence();
+        }
+
+        if(elapsedRealtime() - MainActivity.time_start >10000){
+            MainActivity.cnt_m++;
+            MainActivity.cnt_s++;
+            Log.i("Sample rate", "[" + log_packet_x10_count + "] " + "packet count/10sec = " + MainActivity.cnt_m);
+            MainActivity.time_start = elapsedRealtime();
+            log_packet_x10_count++;
+
         }
 
 //      parse battery level

@@ -22,19 +22,10 @@
  */
 package com.marveldex.seat31;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-
-
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -43,8 +34,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -60,7 +49,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.marveldex.seat31.R;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -89,12 +81,12 @@ public class DeviceListActivity extends Activity {
     private static final long SCAN_PERIOD = 10000; //scanning for 10 seconds
     private Handler mHandler;
     private boolean mScanning;
-
+    static String auto_con_device_addr;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-    	
+
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.title_bar);
@@ -167,6 +159,7 @@ public class DeviceListActivity extends Activity {
      * @return
      * @throws
      */
+
     private void scanLeDevice(final boolean enable) {
         final Button cancelButton = (Button) findViewById(R.id.btn_cancel);
         if (enable) {
@@ -205,12 +198,12 @@ public class DeviceListActivity extends Activity {
             new BluetoothAdapter.LeScanCallback() {
 
         @Override
-        public void onLeScan(final BluetoothDevice device, final int rssi, byte[] scanRecord) {
+        public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                 	
-                              addDevice(device,rssi);
+                              addDevice(device,rssi, scanRecord); //sehjin12
                 }
             });
         }
@@ -224,7 +217,7 @@ public class DeviceListActivity extends Activity {
      * @return
      * @throws
      */
-    private void addDevice(BluetoothDevice device, int rssi) {
+    private void addDevice(BluetoothDevice device, int rssi, byte[] scanRecord) {
         boolean deviceFound = false;
 
         for (BluetoothDevice listDev : deviceList) {
@@ -285,7 +278,9 @@ public class DeviceListActivity extends Activity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             BluetoothDevice device = deviceList.get(position);
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
-  
+
+            auto_con_device_addr = deviceList.get(position).getAddress();
+
             Bundle b = new Bundle();
             b.putString(BluetoothDevice.EXTRA_DEVICE, deviceList.get(position).getAddress());
 
@@ -297,13 +292,10 @@ public class DeviceListActivity extends Activity {
         }
     };
 
-
-    
     protected void onPause() {
         super.onPause();
         scanLeDevice(false);
     }
-
 
     /**
      *

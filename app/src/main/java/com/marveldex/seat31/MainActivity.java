@@ -55,9 +55,6 @@ import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.marveldex.seat31.PacketParser;
-import com.marveldex.seat31.R;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -128,6 +125,11 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     private int toast_flag = 0;
     RelativeLayout ui_coc_com_layout;
 
+    static int cnt_m = 0;
+    static int cnt_s = 0;
+    static long time_start = elapsedRealtime();
+    Button mDetail;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,9 +151,35 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         edtMessage = (EditText) findViewById(R.id.sendText);
         ui_coc_com_layout = (RelativeLayout)findViewById(R.id.RelativeLayout_COM);
 
+        mStateList = (ListView)findViewById(R.id.TV_SEAT_LOG);
+        mDetail = (Button)findViewById(R.id.BTN_Expl_Hide);
+        mlist = new ArrayList<String>();
+
         UI_onCreate();
 
         service_init();
+
+        mDetail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(mlist.size()>0){
+                    if(mStateList.getVisibility() == View.VISIBLE){
+                        mStateList.setVisibility(View.GONE);
+                        mDetail.setText("SHOW");
+                    }else{
+                        mStateList.setVisibility(View.VISIBLE);
+                        mDetail.setText("HIDE");
+                    }
+                }else{
+
+                    Toast toast = Toast.makeText(getApplicationContext(), "디바이스를 연결하세요", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+
+
+            }
+        });
 
         btnConnectDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -288,6 +316,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 /*
                              listAdapter.add("["+currentDateTimeString+"] Disconnected to: "+ mDevice.getName());
 */
+
                              mState = UART_PROFILE_DISCONNECTED;
                              mService.close();
                      }
@@ -331,7 +360,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
                              UI_updateTextView();
 
                              // draw center of mass image
-                             UI_drawImage();
+                              UI_drawImage();
 
                              // save CSV file
                              if (mSave_Flag==true) {
@@ -364,7 +393,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         intentFilter.addAction(com.marveldex.seat31.UartService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(com.marveldex.seat31.UartService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(com.marveldex.seat31.UartService.ACTION_DATA_AVAILABLE);
-        intentFilter.addAction(com.marveldex.seat31.UartService.DEVICE_DOES_NOT_SUPPORT_UART);
+        //intentFilter.addAction(com.marveldex.seat31.UartService.DEVICE_DOES_NOT_SUPPORT_UART);
         return intentFilter;
     }
     @Override
@@ -720,12 +749,11 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     private void UI_drawImage(){
         if(m_PacketParser.isSeatOccupied() == false){
             setPostureState(POSTURE_tag.POSTURE_NO_LOG);
-            tv_PostureState.setText( "POSTURE : "+ String.format("EMPTY, %d sec", getPostureElapsedSecond()));
+            tv_PostureState.setText("POSTURE : "+ String.format("EMPTY, %d sec", getPostureElapsedSecond()).trim());
 
             UI_LEDWORK(0, 1);
-
-            //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral m_LateralVector : 0.0"/>
             mlist = new ArrayList<String>();
+            //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral m_LateralVector : 0.0"/>
             mlist.add(getString(R.string.ui_state_leftside)+ " = 0  // " + getString(R.string.ui_state_rightside) +" =  0");
             mlist.add(getString(R.string.ui_state_coc) + " =  0" );
             mlist.add(getString(R.string.ui_state_com)+ " =  0");
@@ -734,9 +762,6 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
 
             mAdapter = new CustomAdapter(this, 0, mlist);
-
-
-            mStateList = (ListView)findViewById(R.id.TV_SEAT_LOG);
 
             mStateList.setAdapter(mAdapter);
 
@@ -984,17 +1009,14 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     }
 
     private void UI_list(float coord_com, float coord_coc_left, float coord_coc_right, float coord_lateral_vector){
-
-        //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral m_LateralVector : 0.0"/>
         mlist = new ArrayList<String>();
+        //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral m_LateralVector : 0.0"/>
         mlist.add(getString(R.string.ui_state_leftside)+ " = " + String.format("%1.1f",coord_coc_left) +"//" + getString(R.string.ui_state_rightside)+ " = " + coord_coc_right);
         mlist.add(getString(R.string.ui_state_coc) + " = " + String.format("%1.3f",((coord_coc_left + coord_coc_right)/2)));
         mlist.add(getString(R.string.ui_state_com) +" = " + String.format("%1.3f",coord_com));
         mlist.add(getString(R.string.ui_state_vector) + " = " + String.format("%1.3f", coord_lateral_vector));
 
         mAdapter = new CustomAdapter(this, 0, mlist);
-
-        mStateList = (ListView)findViewById(R.id.TV_SEAT_LOG);
         mStateList.setAdapter(mAdapter);
     }
 
