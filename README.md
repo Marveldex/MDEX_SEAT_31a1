@@ -61,16 +61,16 @@ History
 	<div align = "center">
 	<img src="https://github.com/Marveldex/MDEX_SEAT_31a1/blob/master/Image/changedUI.jpg" />
 	</div>
-		- 데이터 수신 상태
-			- Receiving : 데이터 수신 상태 양호
-			- Blind : 데이터 수신 상태 불량
-			- Last Blind : Blind가 발생한 시간 및 경과시간
-			
-		- 자세 정보
-			- left leg : 왼쪽 다리 부착 여부
-			- right leg :  오른쪽 다리 부착 여부
-			- longitudinal : 앞뒤 무게중심 값
-			- Lateral : 좌우 무계중심 값
+	- 데이터 수신 상태
+		- Receiving : 데이터 수신 상태 양호
+		- Blind : 데이터 수신 상태 불량
+		- Last Blind : Blind가 발생한 시간 및 경과시간
+		
+	- 자세 정보
+		- left leg : 왼쪽 다리 부착 여부
+		- right leg :  오른쪽 다리 부착 여부
+		- longitudinal : 앞뒤 무게중심 값
+		- Lateral : 좌우 무계중심 값
 			                                                 
 
 	
