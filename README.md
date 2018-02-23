@@ -40,35 +40,39 @@ History
 
  
 - BLE 연결
-	- 문제 : BLE연결이 끊어졌을 경우 재연결 시 사용자가 수동으로 연결해야 하는 현상
-	- 해결 : 연결이 끊어 졌을 경우 Application 상단에 BLE연결 상태를 Blind로 표시하고 1초마다 재연결을 시도 한다.
+	- 변경 전 : BLE연결이 끊어졌을 경우 재연결 시 사용자가 수동으로 연결해야 함.
+	- 변경 후 : 블루투스의 자동 재연결 옵션 추가. 비너스 보드 단과 연결이 끊어질 경우, 폰에서 재연결을 시도한다. 재연결을 시도하는 동안 BLE상태는 'Receiving'에서 'Blind'로 바뀐다.
+		- 자동 재연결하는 경우
+			- 비너스 보드의 전원이 꺼지거나 폰과의 거리가 멀어질 경우
+		- 자동 재연결하지 않는 경우
+			- 폰을 껐다 켜는 경우
+			- 폰의 블루투스 기능을 껐다 켜는 경우
+			- 폰의 어플을 끄는 경우
 	
 - UI 변경
 
-	- 변경사항 : 디바이스 연결하는 화면에서 가장 최근에 연결되었던 디바이스 리스트의 오른쪽 하단에 'Last paired'로 표시
+	- 추가 사항 : 디바이스 연결하는 화면에서 가장 최근에 연결되었던 디바이스를 파란색으로 'Last device'로 표시
 	<div align = "center">
 	<img src="https://github.com/Marveldex/MDEX_SEAT_31a1/blob/master/Image/selectdevice.jpg" />
 	</div>	
 	                                                                      
-	                                             
-	- 변경사항 : 상단에 BLE연결 상태 표시와 하단에 추가된 자세정보 추가
-		- BLE 정보
-			- Receiving : BLE연결 상태 양호
-			- Blind : BLE연결 상태 끊어짐
-			- Last Blind : Blind가 발생한 시간
-			- 경과시간 : Blind상태가 발생한 후 흐른 시간
+			
+	- 추가 사항 : 신규 기능 추가. 데이터 수신 상태 표시, 자세 분석 추가.
+	<div align = "center">
+	<img src="https://github.com/Marveldex/MDEX_SEAT_31a1/blob/master/Image/changedUI.jpg" />
+	</div>
+		- 데이터 수신 상태
+			- Receiving : 데이터 수신 상태 양호
+			- Blind : 데이터 수신 상태 불량
+			- Last Blind : Blind가 발생한 시간 및 경과시간
 			
 		- 자세 정보
 			- left leg : 왼쪽 다리 부착 여부
 			- right leg :  오른쪽 다리 부착 여부
 			- longitudinal : 앞뒤 무게중심 값
-			- Leteral : 좌우 무계중심 값
+			- Lateral : 좌우 무계중심 값
 			                                                 
-			
-	<div align = "center">
-	<img src="https://github.com/Marveldex/MDEX_SEAT_31a1/blob/master/Image/changedUI.jpg" />
-	</div>
-	
+
 	
 ---------------------------------------
 2017-10-26
