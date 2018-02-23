@@ -28,7 +28,7 @@ Sensor_Number
 </div>
 
 <div align = "center">
-<img src="https://github.com/Marveldex/MDEX_SEAT_31a1/blob/master/Image/selectdevice.jpg" />
+<img src="https://github.com/Marveldex/MDEX_SEAR_31a1/blob/master/Image/protocol_2.png" />
 </div>
 
 
@@ -45,8 +45,8 @@ History
 	
 - UI 변경
 	<div align = "center">
-	<img src="https://github.com/Marveldex/MDEX_SEAR_31a1/blob/master/Image/protocol_2.png" />
-	</div>
+	<img src="https://github.com/Marveldex/MDEX_SEAT_31a1/blob/master/Image/selectdevice.jpg" />
+	</div>	
 	- 변경사항 : 디바이스 연결하는 화면에서 가장 최근에 연결되었던 디바이스 표시(오른쪽 하단에 'paired')
 	
 	
