@@ -55,12 +55,14 @@ History
 		- BLE 정보
 			- Receiving : BLE연결 상태 양호
 			- Blind : BLE연결 상태 끊어짐
+			- Last Blind : Blind가 발생한 시간
+			- 경과시간 : Blind상태가 발생한 후 흐른 시간
 			
 		- 자세 정보
 			- left leg : 왼쪽 다리 부착 여부
 			- right leg :  오른쪽 다리 부착 여부
-			- longitudinal : 착석의 앞뒤 기울기
-			- Leteral : 좌우 기울기
+			- longitudinal : 앞뒤 무게중심 값
+			- Leteral : 좌우 무계중심 값
 			                                                 
 			
 	<div align = "center">
