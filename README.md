@@ -44,18 +44,16 @@ History
 	- 해결 : 연결이 끊어 졌을 경우 Application 상단에 BLE연결 상태를 Blind로 표시하고 1초마다 재연결을 시도 한다.
 	
 - UI 변경
+
 	<div align = "center">
 	<img src="https://github.com/Marveldex/MDEX_SEAT_31a1/blob/master/Image/selectdevice.jpg" />
 	</div>	
-	
 	- 변경사항 : 디바이스 연결하는 화면에서 가장 최근에 연결되었던 디바이스 표시(오른쪽 하단에 'Last paired')
-	
-	<div>
-	
+	                                                                       
 	<div align = "center">
 	<img src="https://github.com/Marveldex/MDEX_SEAT_31a1/blob/master/Image/changedUI.jpg" />
 	</div>
-	
+	                                               
 	- 변경사항 : 상단에 BLE연결 상태 표시와 하단에 추가된 자세정보 추가
 		- BLE 정보
 			- Receiving : BLE연결 상태 양호
