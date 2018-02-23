@@ -28,7 +28,7 @@ Sensor_Number
 </div>
 
 <div align = "center">
-<img src="https://github.com/Marveldex/MDEX_SEAR_31a1/blob/master/Image/protocol_2.png" />
+<img src="https://github.com/Marveldex/MDEX_SEAT_31a1/blob/master/Image/selectdevice.jpg" />
 </div>
 
 
@@ -38,9 +38,18 @@ History
 
 수정사항
 
- - UI
+ 
+- BLE 연결
 	- 문제 : BLE연결이 끊어졌을 경우 재연결 시 사용자가 수동으로 연결해야 하는 현상
 	- 해결 : 연결이 끊어 졌을 경우 Application 상단에 BLE연결 상태를 Blind로 표시하고 1초마다 재연결을 시도 한다.
+	
+- UI 변경
+	<div align = "center">
+	<img src="https://github.com/Marveldex/MDEX_SEAR_31a1/blob/master/Image/protocol_2.png" />
+	</div>
+	- 변경사항 : 디바이스 연결하는 화면에서 가장 최근에 연결되었던 디바이스 표시(오른쪽 하단에 'paired')
+	
+	
 ---------------------------------------
 2017-10-26
 
