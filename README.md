@@ -49,11 +49,8 @@ History
 	<div align = "center">
 	<img src="https://github.com/Marveldex/MDEX_SEAT_31a1/blob/master/Image/selectdevice.jpg" />
 	</div>	
-	                                                                       
-	<div align = "center">
-	<img src="https://github.com/Marveldex/MDEX_SEAT_31a1/blob/master/Image/changedUI.jpg" />
-	</div>
-	                                               
+	                                                                      
+	                                             
 	- 변경사항 : 상단에 BLE연결 상태 표시와 하단에 추가된 자세정보 추가
 		- BLE 정보
 			- Receiving : BLE연결 상태 양호
@@ -64,6 +61,10 @@ History
 			- right leg :  오른쪽 다리 부착 여부
 			- longitudinal : 착석의 앞뒤 기울기
 			- Leteral : 좌우 기울기
+			
+	<div align = "center">
+	<img src="https://github.com/Marveldex/MDEX_SEAT_31a1/blob/master/Image/changedUI.jpg" />
+	</div>
 	
 	
 ---------------------------------------
