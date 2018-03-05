@@ -34,6 +34,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
@@ -66,6 +67,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static android.os.SystemClock.elapsedRealtime;
 
@@ -99,6 +102,8 @@ import static android.os.SystemClock.elapsedRealtime;
  *
  */
 
+
+
 public class   MainActivity extends Activity implements RadioGroup.OnCheckedChangeListener {
     private static final int REQUEST_SELECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
@@ -107,112 +112,83 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     private static final int UART_PROFILE_CONNECTED = 20;
     private static final int UART_PROFILE_DISCONNECTED = 21;
 
-    private int mState = UART_PROFILE_DISCONNECTED;
-    private com.marveldex.seat31.UartService mService = null;
-    private BluetoothDevice mDevice = null;
-    private BluetoothAdapter mBtAdapter = null;
+    private int m_State = UART_PROFILE_DISCONNECTED;
+    private UartService m_UartService = null;
+    private BluetoothDevice m_Device = null;
+    private BluetoothAdapter m_BtAdapter = null;
     //private ListView messageListView;
     //private ArrayAdapter<String> listAdapter;
-    private Button btnConnectDisconnect,btnSend;
+    private Button mbtn_ConnectDisconnect,mbtn_Send;
 
-    ArrayList<String> mlist;
-    ArrayAdapter<String> mAdapter;
-    ListView mStateList;
+    ArrayList<String> m_DetailList;
+    ArrayAdapter<String> m_DetailAdapter;
+    ListView mlv_DetailStateList;
     
     private float m_LateralVector;
     private String m_Mode_Info;
     private TextView m_Mode_TxtView;
-    private int toast_flag = 0;
-    RelativeLayout ui_coc_com_layout;
-
-    static int cnt_m = 0;
-    static int cnt_s = 0;
-    static long time_start = elapsedRealtime();
-    Button mDetail;
+    private int m_ToastFlag = 0;
+    RelativeLayout mrl_ui_coc_com_layout;
+    SharedPreferences pref;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBtAdapter == null) {
+        m_BtAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (m_BtAdapter == null) {
             Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
+
+        pref = getSharedPreferences("MacAddr", Activity.MODE_PRIVATE);
 /*
         messageListView = (ListView) findViewById(R.id.listMessage);
         listAdapter = new ArrayAdapter<String>(this, R.layout.message_detail);
         messageListView.setAdapter(listAdapter);
         messageListView.setDivider(null);
 */
-        btnConnectDisconnect=(Button) findViewById(R.id.btn_select);
-        btnSend=(Button) findViewById(R.id.sendButton);
-        edtMessage = (EditText) findViewById(R.id.sendText);
-        ui_coc_com_layout = (RelativeLayout)findViewById(R.id.RelativeLayout_COM);
-
-        mStateList = (ListView)findViewById(R.id.TV_SEAT_LOG);
-        mDetail = (Button)findViewById(R.id.BTN_Expl_Hide);
-        mlist = new ArrayList<String>();
+        mbtn_ConnectDisconnect=(Button) findViewById(R.id.btn_select);
+        mbtn_Send=(Button) findViewById(R.id.sendButton);
+        medt_Message = (EditText) findViewById(R.id.sendText);
+        mrl_ui_coc_com_layout = (RelativeLayout)findViewById(R.id.RelativeLayout_COM);
 
         UI_onCreate();
 
         service_init();
 
-        mDetail.setOnClickListener(new View.OnClickListener() {
+        mbtn_ConnectDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if(mlist.size()>0){
-                    if(mStateList.getVisibility() == View.VISIBLE){
-                        mStateList.setVisibility(View.GONE);
-                        mDetail.setText("SHOW");
-                    }else{
-                        mStateList.setVisibility(View.VISIBLE);
-                        mDetail.setText("HIDE");
-                    }
-                }else{
-
-                    Toast toast = Toast.makeText(getApplicationContext(), "디바이스를 연결하세요", Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-
-
-            }
-        });
-
-        btnConnectDisconnect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mBtAdapter.isEnabled()) {
+                if (!m_BtAdapter.isEnabled()) {
                     Log.i(TAG, "onClick - BT not enabled yet");
                     Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
                 }
                 else {
-                	if (btnConnectDisconnect.getText().equals("Connect")){
+                	if (mbtn_ConnectDisconnect.getText().equals("Connect")){
                 		
                 		//Connect button pressed, open DeviceListActivity class, with popup windows that scan for devices
                 		
             			Intent newIntent = new Intent(MainActivity.this, com.marveldex.seat31.DeviceListActivity.class);
             			startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
-        			} else {
-        				//Disconnect button pressed
-        				if (mDevice!=null)
-        				{
-        					mService.disconnect();
+        			} else { // Disconnect button pressed
+
+        				if (m_Device!=null){
+        					m_UartService.disconnect();
         					
         				}
         			}
                 }
 
-                toast_flag = 0;
+                m_ToastFlag = 0;
 
             }
         });
 
         // Handle Send button
-        btnSend.setOnClickListener(new View.OnClickListener() {
+        mbtn_Send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
             	EditText editText = (EditText) findViewById(R.id.sendText);
@@ -221,14 +197,14 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 				try {
 					//send data to service
 					value = message.getBytes("UTF-8");
-					mService.writeRXCharacteristic(value);
+					m_UartService.writeRXCharacteristic(value);
 /*
 					//Update the log with time stamp
 					String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
 					listAdapter.add("["+currentDateTimeString+"] TX: "+ message);
                	 	messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
 */
-               	 	edtMessage.setText("");
+               	 	medt_Message.setText("");
 				} catch (UnsupportedEncodingException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -244,20 +220,21 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     //UART service connected/disconnected
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder rawBinder) {
-            mService = ((com.marveldex.seat31.UartService.LocalBinder) rawBinder).getService();
-            Log.d(TAG, "onServiceConnected mService= " + mService);
-            if (!mService.initialize()) {
+            m_UartService = ((com.marveldex.seat31.UartService.LocalBinder) rawBinder).getService();
+            Log.d(TAG, "onServiceConnected m_UartService= " + m_UartService);
+            if (!m_UartService.initialize()) {
                 Log.e(TAG, "Unable to initialize Bluetooth");
                 finish();
             }
         }
 
         public void onServiceDisconnected(ComponentName classname) {
-            if(mService != null) {
-                //mService.disconnect(mDevice);
-                //mService.disconnect();
+            if(m_UartService != null) {
+                //m_UartService.disconnect(m_Device);
+                m_UartService.disconnect();
+                //m_UartService = null;
             }
-            mService = null;
+            //m_UartService = null;
         }
     };
 
@@ -266,7 +243,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         
         //Handler events that received from UART service 
         public void handleMessage(Message msg) {
-  
+            Log.i(TAG, "Uart service handleMessage message= " + msg);
         }
     };
 
@@ -288,17 +265,28 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             if (action.equals(com.marveldex.seat31.UartService.ACTION_GATT_CONNECTED)) {
             	 runOnUiThread(new Runnable() {
                      public void run() {
-                         String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-                         Log.d(TAG, "UART_CONNECT_MSG");
-                         btnConnectDisconnect.setText("Disconnect");
-                         edtMessage.setEnabled(true);
-                         btnSend.setEnabled(true);
-                         ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ " - connected");
+                         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm:ss");
+                         Calendar cal = Calendar.getInstance();
+                         String time_str = dateFormat.format(cal.getTime());
+
+                         Log.d(TAG, "ACTION_GATT_CONNECTED " + time_str);
+                         mbtn_ConnectDisconnect.setText("Disconnect");
+                         medt_Message.setEnabled(true);
+                         mbtn_Send.setEnabled(true);
+
+                         ((TextView) findViewById(R.id.deviceName)).setText(m_Device.getName()+ " - connected " + time_str);
 /*
-                         listAdapter.add("["+currentDateTimeString+"] Connected to: "+ mDevice.getName());
+                         listAdapter.add("["+currentDateTimeString+"] Connected to: "+ m_Device.getName());
                          messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
 */
-                         mState = UART_PROFILE_CONNECTED;
+
+                         //연결 완료  - 맥어드레스 저장
+                         //업데이트
+                         SharedPreferences.Editor editor = pref.edit();
+                         editor.putString("MacAddr",m_Device.getAddress());
+                         editor.commit();
+
+                         m_State = UART_PROFILE_CONNECTED;
                      }
             	 });
             }
@@ -308,24 +296,25 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             	 runOnUiThread(new Runnable() {
                      public void run() {
                     	 	 String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-                             Log.d(TAG, "UART_DISCONNECT_MSG");
-                             btnConnectDisconnect.setText("Connect");
-                             edtMessage.setEnabled(false);
-                             btnSend.setEnabled(false);
+                             Log.d(TAG, "ACTION_GATT_DISCONNECTED");
+                             mbtn_ConnectDisconnect.setText("Connect");
+                             medt_Message.setEnabled(false);
+                             mbtn_Send.setEnabled(false);
                              ((TextView) findViewById(R.id.deviceName)).setText("Not Connected");
 /*
-                             listAdapter.add("["+currentDateTimeString+"] Disconnected to: "+ mDevice.getName());
+                             listAdapter.add("["+currentDateTimeString+"] Disconnected to: "+ m_Device.getName());
 */
-
-                             mState = UART_PROFILE_DISCONNECTED;
-                             mService.close();
+                             m_State = UART_PROFILE_DISCONNECTED;
+                             m_UartService.close();
                      }
                  });
             }
-          
+
+
           //*********************//
             if (action.equals(com.marveldex.seat31.UartService.ACTION_GATT_SERVICES_DISCOVERED)) {
-             	 mService.enableTXNotification();
+             	 m_UartService.enableTXNotification();
+                Log.d(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
             }
 
             //-----------------------------------------------------
@@ -360,10 +349,10 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
                              UI_updateTextView();
 
                              // draw center of mass image
-                              UI_drawImage();
+                             UI_drawImage();
 
                              // save CSV file
-                             if (mSave_Flag==true) {
+                             if (m_SaveFlag==true) {
                                  UI_CSV_makeCSVdata();
                              }
                          }
@@ -375,7 +364,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
            //*********************//
             if (action.equals(com.marveldex.seat31.UartService.DEVICE_DOES_NOT_SUPPORT_UART)){
             	showMessage("Device doesn't support UART. Disconnecting");
-            	mService.disconnect();
+            	m_UartService.disconnect();
             }
         }
     };
@@ -393,7 +382,19 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         intentFilter.addAction(com.marveldex.seat31.UartService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(com.marveldex.seat31.UartService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(com.marveldex.seat31.UartService.ACTION_DATA_AVAILABLE);
-        //intentFilter.addAction(com.marveldex.seat31.UartService.DEVICE_DOES_NOT_SUPPORT_UART);
+        intentFilter.addAction(com.marveldex.seat31.UartService.DEVICE_DOES_NOT_SUPPORT_UART);
+
+        //      gap messages
+        intentFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        intentFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+        intentFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+
+        intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
+        //intentFilter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);
+
+        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+
         return intentFilter;
     }
     @Override
@@ -412,8 +413,8 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             Log.e(TAG, ignore.toString());
         } 
         unbindService(mServiceConnection);
-        mService.stopSelf();
-        mService= null;
+        m_UartService.stopSelf();
+        m_UartService= null;
        
     }
 
@@ -439,7 +440,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
-        if (!mBtAdapter.isEnabled()) {
+        if (!m_BtAdapter.isEnabled()) {
             Log.i(TAG, "onResume - BT not enabled yet");
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
@@ -460,13 +461,13 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         	//When the DeviceListActivity return, with the selected device address
             if (resultCode == Activity.RESULT_OK && data != null) {
                 String deviceAddress = data.getStringExtra(BluetoothDevice.EXTRA_DEVICE);
-                mDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(deviceAddress);
+                m_Device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(deviceAddress);
                
-                Log.d(TAG, "... onActivityResultdevice.address==" + mDevice + "mserviceValue" + mService);
-                ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ " - connecting");
-                btnConnectDisconnect.setText("Connecting...");
+                Log.d(TAG, "... onActivityResultdevice.address==" + m_Device + "mserviceValue" + m_UartService);
+                ((TextView) findViewById(R.id.deviceName)).setText(m_Device.getName()+ " - connecting");
+                mbtn_ConnectDisconnect.setText("Connecting...");
 
-                mService.connect(deviceAddress);
+                m_UartService.connect(deviceAddress);
             }
             break;
         case REQUEST_ENABLE_BT:
@@ -497,7 +498,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
     @Override
     public void onBackPressed() {
-        if (mState == UART_PROFILE_CONNECTED) {
+        if (m_State == UART_PROFILE_CONNECTED) {
             Intent startMain = new Intent(Intent.ACTION_MAIN);
             startMain.addCategory(Intent.CATEGORY_HOME);
             startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -528,25 +529,26 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     //  Variables - UI Vies
-    private EditText edtMessage;
-    private TextView edtBatteryLevel;
-    private TextView edtLastPacketTime;
-    private TextView tv_PostureState;
-    Space sp_COM_sero;
-    Space sp_COC_left;
-    Space sp_COC_right;
-    Space sp_COC;
-    ImageView iv_COM_bar;
-    ImageView iv_COC;
-    int nImageCOM_offset = 0;
-    int nImageCOC_offset = 0;
-    TextView tvFilePathName;
-
+    private EditText medt_Message;
+    private TextView mtv_BatteryLevel;
+    private TextView mtv_LastPacketTime;
+    private TextView mtv_PostureState;
+    Space msp_COM_sero;
+    Space msp_COC_left;
+    Space msp_COC_right;
+    Space msp_COC;
+    ImageView miv_COM_bar;
+    ImageView miv_COC;
+    int m_nImageCOM_offset = 0;
+    int m_nImageCOC_offset = 0;
+    TextView mtv_FilePathName;
+    private TextView mtv_BlindState, mtv_BlindStartTime, mtv_BlindElapsedTime;
+    private TextView mtv_LeftLegCrossed, mtv_RightLegCrossed, mtv_LongitudinalVector, mtv_LateralVector;
 
     //  Variables - Raw data
-    private TextView [] tvaChairCells_Row0 = new TextView[PacketParser.def_CELL_COUNT_ROW0];
-    private TextView [] tvaChairCells_Row1 = new TextView[PacketParser.def_CELL_COUNT_ROW1];
-    private TextView [] tvaChairCells_Row2 = new TextView[PacketParser.def_CELL_COUNT_ROW2];
+    private TextView [] mtv_aChairCells_Row0 = new TextView[PacketParser.def_CELL_COUNT_ROW0];
+    private TextView [] mtv_aChairCells_Row1 = new TextView[PacketParser.def_CELL_COUNT_ROW1];
+    private TextView [] mtv_aChairCells_Row2 = new TextView[PacketParser.def_CELL_COUNT_ROW2];
     PacketParser m_PacketParser = new PacketParser();
 
 
@@ -564,83 +566,144 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
 
     //  Variables - Save CSV
-    Button mSave_Start;
-    private boolean mSave_Flag = false;
-    private String mPosition_Csv = null;
-    Map<String, Object> hmap = null;
+    Button mbtn_Save_Start;
+    private boolean m_SaveFlag = false;
+    private String m_PositionCsv = null;
+    Map<String, Object> m_HashMap = null;
 
     /**
      *
      * @brief App의 화면의 컨트롤들 선언
      * @details App의 화면을 구성하는 컨트롤들을 불러와 각 변수에 선언하여 사용할수 있게 셌팅한다.
-     * @param void
+     * @param
      * @return void
      * @throws
      */
     private void UI_onCreate(){
-        edtBatteryLevel = (TextView) findViewById(R.id.TV_BatteryLevel);
-        edtLastPacketTime = (TextView)findViewById(R.id.TV_CurTime);
+        mtv_BatteryLevel = (TextView) findViewById(R.id.TV_BatteryLevel);
+        mtv_LastPacketTime = (TextView)findViewById(R.id.TV_CurTime);
+
+        mtv_BlindState = (TextView)findViewById(R.id.TV_BLIND_STATE);
+        mtv_BlindStartTime = (TextView)findViewById(R.id.TV_BLIND_TIME_START);
+        mtv_BlindElapsedTime = (TextView)findViewById(R.id.TV_BLIND_TIME_ELAPSED);
+        mtv_LeftLegCrossed = (TextView)findViewById(R.id.TV_LEFT_LEG_CROSSED);
+        mtv_RightLegCrossed = (TextView)findViewById(R.id.TV_RIGHT_LEG_CROSSED);
+        mtv_LongitudinalVector = (TextView)findViewById(R.id.TV_LONGITUDINAL_VECTOR);
+        mtv_LateralVector = (TextView)findViewById(R.id.TV_LATERAL_VECTOR);
 
         int cell_index = 0;
-        tvaChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_0);
-        tvaChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_1);
-        tvaChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_2);
-        tvaChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_3);
-        tvaChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_4);
-        tvaChairCells_Row0[cell_index] =(TextView)findViewById(R.id.TV_CHAIR_0_5);
+        mtv_aChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_0);
+        mtv_aChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_1);
+        mtv_aChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_2);
+        mtv_aChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_3);
+        mtv_aChairCells_Row0[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_0_4);
+        mtv_aChairCells_Row0[cell_index] =(TextView)findViewById(R.id.TV_CHAIR_0_5);
 
         cell_index = 0;
-        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_0);
-        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_1);
-        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_2);
-        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_3);
-        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_4);
-        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_5);
-        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_6);
-        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_7);
-        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_8);
-        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_9);
-        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_10);
-        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_11);
-        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_12);
-        tvaChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_13);
-        tvaChairCells_Row1[cell_index] =(TextView)findViewById(R.id.TV_CHAIR_1_14);
+        mtv_aChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_0);
+        mtv_aChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_1);
+        mtv_aChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_2);
+        mtv_aChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_3);
+        mtv_aChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_4);
+        mtv_aChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_5);
+        mtv_aChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_6);
+        mtv_aChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_7);
+        mtv_aChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_8);
+        mtv_aChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_9);
+        mtv_aChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_10);
+        mtv_aChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_11);
+        mtv_aChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_12);
+        mtv_aChairCells_Row1[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_1_13);
+        mtv_aChairCells_Row1[cell_index] =(TextView)findViewById(R.id.TV_CHAIR_1_14);
 
         cell_index = 0;
-        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_0);
-        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_1);
-        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_2);
-        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_3);
-        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_4);
-        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_5);
-        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_6);
-        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_7);
-        tvaChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_8);
-        tvaChairCells_Row2[cell_index] =(TextView)findViewById(R.id.TV_CHAIR_2_9);
+        mtv_aChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_0);
+        mtv_aChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_1);
+        mtv_aChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_2);
+        mtv_aChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_3);
+        mtv_aChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_4);
+        mtv_aChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_5);
+        mtv_aChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_6);
+        mtv_aChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_7);
+        mtv_aChairCells_Row2[cell_index++] =(TextView)findViewById(R.id.TV_CHAIR_2_8);
+        mtv_aChairCells_Row2[cell_index] =(TextView)findViewById(R.id.TV_CHAIR_2_9);
 
-        edtBatteryLevel.setText(String.format(getString(R.string.fmt_battery_level), 0));
+        mtv_BatteryLevel.setText(String.format(getString(R.string.fmt_battery_level), 0));
 
-        tv_PostureState = (TextView)findViewById(R.id.TV_POSTURE_LATERAL );
-        sp_COM_sero = (Space)findViewById(R.id.space_COM);
-        sp_COC_left = (Space)findViewById(R.id.space_COC_LEFT);
-        sp_COC_right = (Space)findViewById(R.id.space_COC_RIGHT);
-        iv_COM_bar = (ImageView)findViewById(R.id.iv_COM_SERO);
-        iv_COC = (ImageView)findViewById(R.id.iv_coc);
-        sp_COC = (Space)findViewById(R.id.space_COC);
+        mtv_PostureState = (TextView)findViewById(R.id.TV_POSTURE_LATERAL );
+        msp_COM_sero = (Space)findViewById(R.id.space_COM);
+        msp_COC_left = (Space)findViewById(R.id.space_COC_LEFT);
+        msp_COC_right = (Space)findViewById(R.id.space_COC_RIGHT);
+        miv_COM_bar = (ImageView)findViewById(R.id.iv_COM_SERO);
+        miv_COC = (ImageView)findViewById(R.id.iv_coc);
+        msp_COC = (Space)findViewById(R.id.space_COC);
 
         m_PostureState = POSTURE_tag.POSTURE_NO_LOG;
 
-        mSave_Start = (Button)findViewById(R.id.Save_Start);
-        tvFilePathName = (TextView)findViewById(R.id.TV_FILEPATH);
+        mbtn_Save_Start = (Button)findViewById(R.id.Save_Start);
+        mtv_FilePathName = (TextView)findViewById(R.id.TV_FILEPATH);
         m_Mode_TxtView = (TextView)findViewById(R.id.MODE_INFO);
 
+
+        m_ConnectionMonitorTimer.schedule(new com.marveldex.seat31.MainActivity.TimerTask_ConnectionMonitor(), 500,TIMER_PERIOD_MONITOR);
     }
 
+    private Timer m_ConnectionMonitorTimer  = new Timer();
+    private final int TIMER_PERIOD_MONITOR  = 1000; // 1000 : 1 sec
+    int m_Blind_ElapsedTime = 0;
+    int m_Blind_ElapsedTime_Last= 0;
+    private static final int THRESHOLD_BLIND_SEC = 3;  // THRESHOLD_BLIND_SEC : threshold to decide blind state
+    private static final int CONN_STATE_DISCONNECT = 0;
+    private static final int CONN_STATE_CONNECT_OK = 1;
+    private static final int CONN_STATE_CONNECT_BLIND = 2;
+    int m_AutoConn_State = CONN_STATE_DISCONNECT;
+
+    private class TimerTask_ConnectionMonitor extends TimerTask {
+        @Override
+        public void run() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(m_State == UART_PROFILE_DISCONNECTED) {
+                        m_AutoConn_State = CONN_STATE_DISCONNECT;
+                        if(com.marveldex.seat31.UartService.getIsDisconnIntentional() == false) {
+                            //  This disconnect message is...
+                            //  not occurred by device disconnect request. (Device disconnect doesn't make disconnect message in phone)
+                            //  not occurred by phone disconnect request. (Phone disconnect request make UartService.m_is_Disconnect_Intentional flag be true)
+                            //  occurred only when this application is just launched. So reconnection needs device mac info to connect.
+                        }
+                        return;
+                    }
+
+                    //  case (m_State == UART_PROFILE_CONNECTED)
+                    m_Blind_ElapsedTime++;
+                    if(THRESHOLD_BLIND_SEC <= m_Blind_ElapsedTime) {
+                        m_Blind_ElapsedTime_Last = m_Blind_ElapsedTime;
+                        //  first time
+                        if(m_Blind_ElapsedTime_Last == THRESHOLD_BLIND_SEC) {
+                            m_AutoConn_State = CONN_STATE_CONNECT_BLIND;
+
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm:ss");
+                            Calendar cal = Calendar.getInstance();
+                            String time_str = dateFormat.format(cal.getTime());
+                            mtv_BlindStartTime.setText("Last blind : " + time_str);
+
+                            mtv_BlindState.setText("State : Blind");
+                        }
+                        mtv_BlindElapsedTime.setText(m_Blind_ElapsedTime_Last + " sec");
+                    }
+                    else {
+                        return;
+                    }
+                }
+            });
+        }
+    }
     /**
      *
      * @brief 변수에 value setting
      * @details 각 변수에 전달 받은 압력값을 Setting 하고 CSV FIle저장 유무에 따라 데이터를 따라 저장한다.
-     * @param void
+     * @param
      * @return void
      * @throws
      */
@@ -657,9 +720,9 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             m_Mode_TxtView.setText(getString(R.string.ui_dip_switch_txt));
             //toast 보여주기
 
-            if(toast_flag == 0 ){
+            if(m_ToastFlag == 0 ){
                 toast.show();
-                toast_flag = toast_flag + 1;
+                m_ToastFlag = m_ToastFlag + 1;
             }
 
 
@@ -674,11 +737,15 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm:ss");
             Calendar cal = Calendar.getInstance();
             String time_str = dateFormat.format(cal.getTime());
-            edtLastPacketTime.setText(getString(R.string.fmt_time_last_packet) + time_str);
+            mtv_LastPacketTime.setText(getString(R.string.fmt_time_last_packet) + time_str);
+
+            m_AutoConn_State = CONN_STATE_CONNECT_OK;
+            m_Blind_ElapsedTime = 0;
+            mtv_BlindState.setText("State : Receiving");
         }
 
         //  UI - battery level
-        edtBatteryLevel.setText(String.format(getString(R.string.fmt_battery_level), PacketParser.getBatteryLevel()));
+        mtv_BatteryLevel.setText(String.format(getString(R.string.fmt_battery_level), PacketParser.getBatteryLevel()));
 
         //  UI - cell data and color
         {
@@ -688,30 +755,48 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
             for (cell_index = 0 ; cell_index < PacketParser.def_CELL_COUNT_ROW0 ; cell_index++){
                 nSensorValue = m_PacketParser.getSensorDataByCoord(row_index, cell_index);
-                tvaChairCells_Row0[cell_index].setText(String.format("%d", nSensorValue));
-                tvaChairCells_Row0[cell_index].setBackgroundColor(0x00FF0000 | (nSensorValue << 24) );
+                mtv_aChairCells_Row0[cell_index].setText(String.format("%d", nSensorValue));
+                mtv_aChairCells_Row0[cell_index].setBackgroundColor(0x00FF0000 | (nSensorValue << 24) );
             }
 
             row_index = 1;
             for (cell_index = 0 ; cell_index < PacketParser.def_CELL_COUNT_ROW1 ; cell_index++){
                 nSensorValue = m_PacketParser.getSensorDataByCoord(row_index, cell_index);
-                tvaChairCells_Row1[cell_index].setText(String.format("%d", nSensorValue));
-                tvaChairCells_Row1[cell_index].setBackgroundColor(0x00FF0000 | (nSensorValue << 24) );
+                mtv_aChairCells_Row1[cell_index].setText(String.format("%d", nSensorValue));
+                mtv_aChairCells_Row1[cell_index].setBackgroundColor(0x00FF0000 | (nSensorValue << 24) );
             }
 
             row_index = 2;
             for (cell_index = 0 ; cell_index < PacketParser.def_CELL_COUNT_ROW2 ; cell_index++){
                 nSensorValue = m_PacketParser.getSensorDataByCoord(row_index, cell_index);
-                tvaChairCells_Row2[cell_index].setText(String.format("%d", nSensorValue));
-                tvaChairCells_Row2[cell_index].setBackgroundColor(0x00FF0000 | (nSensorValue << 24) );
+                mtv_aChairCells_Row2[cell_index].setText(String.format("%d", nSensorValue));
+                mtv_aChairCells_Row2[cell_index].setBackgroundColor(0x00FF0000 | (nSensorValue << 24) );
             }
+        }
+
+        //  UI - result of posture determination
+        {
+            boolean is_left_leg_on =  m_PacketParser.isLeftLeg_StuckOnChair();
+            boolean is_right_leg_on =  m_PacketParser.isRightLeg_StuckOnChair();
+            String is_left_leg_msg =  is_left_leg_on == true ? "on" : "off";
+            String is_right_leg_msg =  is_right_leg_on == true ? "on" : "off";
+
+            mtv_LeftLegCrossed.setText(String.format("left leg : " + is_left_leg_msg));
+            mtv_RightLegCrossed.setText(String.format("right leg : " + is_right_leg_msg));
+
+            float longitudinal_vector = m_PacketParser.getLongitudinalVector();
+            float lateral_vector = m_PacketParser.getLateralVector();
+
+            mtv_LongitudinalVector.setText(String.format("longitudinal : %1.2f", longitudinal_vector));
+            mtv_LateralVector.setText(String.format("lateral : %1.2f", lateral_vector));
+
         }
     }
 
     /**
      * @brief   현재의 자세를 태그로 저장한다.
      * @detail  추가로 현재의 자세를 취한 시점의 시간을 저장한다. 이 값은 현재의 자세를 유지할 경우, 몇초간 유지하고 있는 지를 UI에서 보여줄 때 사용된다.
-     * @param   void
+     * @param
      * @return  void
      */
     private void setPostureState(POSTURE_tag posture_state) {
@@ -723,7 +808,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
     /**
      * @brief   현재의 자세 태그를 반환한다.
-     * @param   void
+     * @param
      * @return  자세 태그 (POSTURE_tag enum)
      */
     private POSTURE_tag getPostureState(){
@@ -732,7 +817,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
     /**
      * @brief   현재의 자세를 취한 시간 길이를 측정하여 반환한다.
-     * @param   void
+     * @param
      * @return  시간 (초 단위)
      */
     private long getPostureElapsedSecond(){
@@ -749,21 +834,25 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     private void UI_drawImage(){
         if(m_PacketParser.isSeatOccupied() == false){
             setPostureState(POSTURE_tag.POSTURE_NO_LOG);
-            tv_PostureState.setText("POSTURE : "+ String.format("EMPTY, %d sec", getPostureElapsedSecond()).trim());
+            mtv_PostureState.setText( "POSTURE : "+ String.format("EMPTY, %d sec", getPostureElapsedSecond()));
 
             UI_LEDWORK(0, 1);
-            mlist = new ArrayList<String>();
+
             //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral m_LateralVector : 0.0"/>
-            mlist.add(getString(R.string.ui_state_leftside)+ " = 0  // " + getString(R.string.ui_state_rightside) +" =  0");
-            mlist.add(getString(R.string.ui_state_coc) + " =  0" );
-            mlist.add(getString(R.string.ui_state_com)+ " =  0");
-            //mlist.add("lateral Vector = " + (coord_com - ((coord_coc_left + coord_coc_right)/2)));
-            mlist.add(getString(R.string.ui_state_vector) + "=  0");
+            m_DetailList = new ArrayList<String>();
+            m_DetailList.add(getString(R.string.ui_state_leftside)+ " = 0  // " + getString(R.string.ui_state_rightside) +" =  0");
+            m_DetailList.add(getString(R.string.ui_state_coc) + " =  0" );
+            m_DetailList.add(getString(R.string.ui_state_com)+ " =  0");
+            //m_DetailList.add("lateral Vector = " + (coord_com - ((coord_coc_left + coord_coc_right)/2)));
+            m_DetailList.add(getString(R.string.ui_state_vector) + "=  0");
 
 
-            mAdapter = new CustomAdapter(this, 0, mlist);
+            m_DetailAdapter = new CustomAdapter(this, 0, m_DetailList);
 
-            mStateList.setAdapter(mAdapter);
+
+            mlv_DetailStateList = (ListView)findViewById(R.id.TV_SEAT_LOG);
+
+            mlv_DetailStateList.setAdapter(m_DetailAdapter);
 
             return;
         }
@@ -773,26 +862,26 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         //--------------------------------------------------------------------
 
         //  UI - calculate summation of Row1 textview array
-        int ui_cell_width =  tvaChairCells_Row1[0].getMeasuredWidth();
+        int ui_cell_width =  mtv_aChairCells_Row1[0].getMeasuredWidth();
         int ui_coc_area_size = ui_cell_width * PacketParser.def_CELL_COUNT_ROW1;
 
 
 
         //  UI - finding left margin of Row1 textview array
         int[] locations = new int[2];
-        tvaChairCells_Row1[0].getLocationOnScreen(locations);
+        mtv_aChairCells_Row1[0].getLocationOnScreen(locations);
         int ui_left_of_most_left_cell = locations[0];
         int ui_left_margin = ui_coc_area_size / 2 + ui_left_of_most_left_cell;
 
         //  UI - half of imageview "COM, coc"
-        nImageCOM_offset = iv_COM_bar.getMeasuredWidth() / 2;
-        nImageCOC_offset = iv_COC.getMeasuredWidth()/2;
+        m_nImageCOM_offset = miv_COM_bar.getMeasuredWidth() / 2;
+        m_nImageCOC_offset = miv_COC.getMeasuredWidth()/2;
 
-        //ui_coc_com_layout.setLayoutParams(new RelativeLayout(986, 80));
+        //mrl_ui_coc_com_layout.setLayoutParams(new RelativeLayout(986, 80));
 
         //  find COM coordinate
         float proportion_com_x  = m_PacketParser.getLateralCOM_Row1();
-        int ui_com_x            = ui_left_margin + (int)(ui_cell_width * proportion_com_x) - nImageCOM_offset;
+        int ui_com_x            = ui_left_margin + (int)(ui_cell_width * proportion_com_x) - m_nImageCOM_offset;
 
         //ui_com_x = 100;
 
@@ -804,7 +893,7 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         float proportion_coc_right  = m_PacketParser.getLateralCOC_right_Row1();
         int ui_coc_right            = ui_left_margin + (int)(ui_cell_width * proportion_coc_right) - 10;
 
-        int ui_coc_x = ((ui_coc_left + ui_coc_right) / 2) - nImageCOC_offset + 14;
+        int ui_coc_x = ((ui_coc_left + ui_coc_right) / 2) - m_nImageCOC_offset + 14;
 
         m_LateralVector = (proportion_com_x - ((proportion_coc_left + proportion_coc_right)/2));
 
@@ -824,30 +913,30 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         {
 
             //  calculate COM - lateral
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)sp_COM_sero.getLayoutParams();
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)msp_COM_sero.getLayoutParams();
             params.setMargins(0, 0, ui_com_x, 0); //substitute parameters for left, top, right, bottom
-            sp_COM_sero.setLayoutParams(params);
+            msp_COM_sero.setLayoutParams(params);
 
 
             if(m_LateralVector < -1.0F){
-                tv_PostureState.setText(String.format("POSTURE : LEFT - BAD (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
+                mtv_PostureState.setText(String.format("POSTURE : LEFT - BAD (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_LEFT_BAD);
 
             }
             else if(m_LateralVector < -0.4F){
-                tv_PostureState.setText(String.format("POSTURE : LEFT (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
+                mtv_PostureState.setText(String.format("POSTURE : LEFT (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_LEFT);
             }
             else if(m_LateralVector < 0.4F){
-                tv_PostureState.setText(String.format("POSTURE : CENTER (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
+                mtv_PostureState.setText(String.format("POSTURE : CENTER (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_CENTER);
             }
             else if(m_LateralVector < 1.0F){
-                tv_PostureState.setText(String.format("POSTURE : RIGHT (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
+                mtv_PostureState.setText(String.format("POSTURE : RIGHT (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_RIGHT);
             }
             else {
-                tv_PostureState.setText(String.format("POSTURE : RIGHT - BAD (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
+                mtv_PostureState.setText(String.format("POSTURE : RIGHT - BAD (%1.3f), %d sec", m_LateralVector, getPostureElapsedSecond()));
                 setPostureState(POSTURE_tag.POSTURE_RIGHT_BAD);
             }
         }
@@ -855,22 +944,22 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
         //  UI draw left line of COC
         {
             //  calculate COC - left
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) sp_COC_left.getLayoutParams();
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) msp_COC_left.getLayoutParams();
             params.setMargins(0, 0, ui_coc_left, 0); //substitute parameters for left, top, right, bottom
-            sp_COC_left.setLayoutParams(params);
+            msp_COC_left.setLayoutParams(params);
         }
 
         //  UI draw right line of COC
         {
             //  calculate COC - right
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)sp_COC_right.getLayoutParams();
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)msp_COC_right.getLayoutParams();
             params.setMargins(0, 0, ui_coc_right, 0); //substitute parameters for left, top, right, bottom
-            sp_COC_right.setLayoutParams(params);
+            msp_COC_right.setLayoutParams(params);
         }
         {
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)sp_COC.getLayoutParams();
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)msp_COC.getLayoutParams();
             params.setMargins(0, 0, ui_coc_x, 0); //subst.itute parameters for left, top, right, bottom
-            sp_COC.setLayoutParams(params);
+            msp_COC.setLayoutParams(params);
         }
     }
 
@@ -887,42 +976,42 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             SimpleDateFormat sdfNow = new SimpleDateFormat("yyyyMMdd_HHmmss");
             String formatDate = sdfNow.format(date);
 
-            hmap = new HashMap<String, Object>();
+            m_HashMap = new HashMap<String, Object>();
 
             //  Row 0
             for (cell_index = 0 ; cell_index < PacketParser.def_CELL_COUNT_ROW0 ; cell_index++){
-                String nPoint = tvaChairCells_Row0[cell_index].getText().toString();
+                String nPoint = mtv_aChairCells_Row0[cell_index].getText().toString();
 
-                if(mPosition_Csv==null){
-                    mPosition_Csv = formatDate +"," +  "0_" + cell_index + "," + nPoint + ",";
+                if(m_PositionCsv==null){
+                    m_PositionCsv = formatDate +"," +  "0_" + cell_index + "," + nPoint + ",";
 
                 }else{
 
                     if(cell_index==0){
-                        mPosition_Csv =  mPosition_Csv + formatDate +"," +  "0_" + cell_index + "," + nPoint + ",";
+                        m_PositionCsv =  m_PositionCsv + formatDate +"," +  "0_" + cell_index + "," + nPoint + ",";
 
                     }else{
-                        mPosition_Csv =  mPosition_Csv  + "0_" + cell_index + "," + nPoint + ",";
+                        m_PositionCsv =  m_PositionCsv  + "0_" + cell_index + "," + nPoint + ",";
                     }
                 }
             }
 
             //  Row 1
             for (cell_index = 0 ; cell_index < PacketParser.def_CELL_COUNT_ROW1 ; cell_index++){
-                String nPoint1 = tvaChairCells_Row1[cell_index].getText().toString();
+                String nPoint1 = mtv_aChairCells_Row1[cell_index].getText().toString();
 
-                mPosition_Csv = mPosition_Csv + "1_" + cell_index + "," + nPoint1 + ",";
+                m_PositionCsv = m_PositionCsv + "1_" + cell_index + "," + nPoint1 + ",";
             }
 
             //  Row 2
             for (cell_index = 0 ; cell_index < PacketParser.def_CELL_COUNT_ROW2 ; cell_index++){
-                String nPoint2 = tvaChairCells_Row2[cell_index].getText().toString();
+                String nPoint2 = mtv_aChairCells_Row2[cell_index].getText().toString();
 
                 if(cell_index < 9 ){
-                    mPosition_Csv = mPosition_Csv + "2_" + cell_index + "," + nPoint2 + ",";
+                    m_PositionCsv = m_PositionCsv + "2_" + cell_index + "," + nPoint2 + ",";
 
                 }else{
-                    mPosition_Csv = mPosition_Csv + "2_" + cell_index + "," + nPoint2 + "\r\n";
+                    m_PositionCsv = m_PositionCsv + "2_" + cell_index + "," + nPoint2 + "\r\n";
                 }
             }
 
@@ -940,18 +1029,18 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
 
     public void UI_onClickSaveCSV(View v) {
         //  if : toggle - start save
-        if (mSave_Flag == false) {
-            mSave_Flag = true;
-            mSave_Start.setEnabled(true);
-            mSave_Start.setText(getString(R.string.fmt_stop_save));
+        if (m_SaveFlag == false) {
+            m_SaveFlag = true;
+            mbtn_Save_Start.setEnabled(true);
+            mbtn_Save_Start.setText(getString(R.string.fmt_stop_save));
         }
         //  else : toggle - stop save
         else {
-            mSave_Flag = false;
+            m_SaveFlag = false;
             //파일 생성
             UI_saveCSVFile();
-            mSave_Start.setEnabled(true);
-            mSave_Start.setText(getString(R.string.fmt_start_save));
+            mbtn_Save_Start.setEnabled(true);
+            mbtn_Save_Start.setText(getString(R.string.fmt_start_save));
             Toast.makeText(this, getString(R.string.fmt_save_msg), Toast.LENGTH_SHORT).show();
         }
     }
@@ -997,8 +1086,8 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             try {
                 //send data to service
                 value = send_msg.getBytes("UTF-8");
-                mService.writeRXCharacteristic(value);
-                edtMessage.setText("");
+                m_UartService.writeRXCharacteristic(value);
+                medt_Message.setText("");
             } catch (UnsupportedEncodingException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -1009,22 +1098,25 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
     }
 
     private void UI_list(float coord_com, float coord_coc_left, float coord_coc_right, float coord_lateral_vector){
-        mlist = new ArrayList<String>();
-        //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral m_LateralVector : 0.0"/>
-        mlist.add(getString(R.string.ui_state_leftside)+ " = " + String.format("%1.1f",coord_coc_left) +"//" + getString(R.string.ui_state_rightside)+ " = " + coord_coc_right);
-        mlist.add(getString(R.string.ui_state_coc) + " = " + String.format("%1.3f",((coord_coc_left + coord_coc_right)/2)));
-        mlist.add(getString(R.string.ui_state_com) +" = " + String.format("%1.3f",coord_com));
-        mlist.add(getString(R.string.ui_state_vector) + " = " + String.format("%1.3f", coord_lateral_vector));
 
-        mAdapter = new CustomAdapter(this, 0, mlist);
-        mStateList.setAdapter(mAdapter);
+        //contour, left edge : -7, right edge : 7\n center of contour : 0 \n center of mass : 0 \n lateral m_LateralVector : 0.0"/>
+        m_DetailList = new ArrayList<String>();
+        m_DetailList.add(getString(R.string.ui_state_leftside)+ " = " + String.format("%1.1f",coord_coc_left) +"//" + getString(R.string.ui_state_rightside)+ " = " + coord_coc_right);
+        m_DetailList.add(getString(R.string.ui_state_coc) + " = " + String.format("%1.3f",((coord_coc_left + coord_coc_right)/2)));
+        m_DetailList.add(getString(R.string.ui_state_com) +" = " + String.format("%1.3f",coord_com));
+        m_DetailList.add(getString(R.string.ui_state_vector) + " = " + String.format("%1.3f", coord_lateral_vector));
+
+        m_DetailAdapter = new CustomAdapter(this, 0, m_DetailList);
+
+        mlv_DetailStateList = (ListView)findViewById(R.id.TV_SEAT_LOG);
+        mlv_DetailStateList.setAdapter(m_DetailAdapter);
     }
 
     private class CustomAdapter extends ArrayAdapter<String>{
 
         public CustomAdapter(Context context, int textViewResourceId, ArrayList<String> objects) {
             super(context, textViewResourceId, objects);
-            //this.mlist = objects;
+            //this.m_DetailList = objects;
         }
         public View getView(int position, View convertView, ViewGroup parent) {
             View v = convertView;
@@ -1037,13 +1129,13 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             ImageView imageView = (ImageView)v.findViewById(R.id.imageView);
 
             // 리스트뷰의 아이템에 이미지를 변경한다.
-            if(mlist.get(position).substring(0, 7).equals("Contour"))
+            if(m_DetailList.get(position).substring(0, 7).equals("Contour"))
                 imageView.setImageResource(R.drawable.total);
-            else if(mlist.get(position).substring(0, 17).equals("Center of Contour"))
+            else if(m_DetailList.get(position).substring(0, 17).equals("Center of Contour"))
                 imageView.setImageResource(R.drawable.coc);
-            else if(mlist.get(position).substring(0, 14).equals("Center of Mass"))
+            else if(m_DetailList.get(position).substring(0, 14).equals("Center of Mass"))
                 imageView.setImageResource(R.drawable.com);
-            else if(mlist.get(position).substring(0, 7).equals("Lateral")){
+            else if(m_DetailList.get(position).substring(0, 7).equals("Lateral")){
                 //imageView.setImageResource(R.drawable.vector_center);
                 if(  - 0.7< m_LateralVector && m_LateralVector < -0.3){
 
@@ -1065,16 +1157,16 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
                     imageView.setImageResource(R.drawable.vector_center);
                 }
             }
-           /* else if(mlist.get(position).substring(0, 7).equals("Lateral")){
+           /* else if(m_DetailList.get(position).substring(0, 7).equals("Lateral")){
 
             }*/
 
             TextView textView = (TextView)v.findViewById(R.id.textView);
-            textView.setText(mlist.get(position));
+            textView.setText(m_DetailList.get(position));
 
-            final String text = mlist.get(position);
+            final String text = m_DetailList.get(position);
 
-            //tvFilePathName.setText(text);
+            //mtv_FilePathName.setText(text);
 
             return v;
         }
@@ -1084,9 +1176,9 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
      *
      * @brief save CSV File
      * @details When you Click 'Save Stop' Button, this Function count the now date and create CSV File. the File name is TODAY.csv
-     * @param none
+     * @param
      * @return none
-     * @throws check the File existed and Direct, Create CSV File
+     * @throws
      */
     private void UI_saveCSVFile(){
 
@@ -1105,11 +1197,11 @@ public class   MainActivity extends Activity implements RadioGroup.OnCheckedChan
             PrintWriter csv_writer;
             csv_writer = new  PrintWriter(new FileWriter(file,true));
 
-            csv_writer.print(mPosition_Csv);
+            csv_writer.print(m_PositionCsv);
             //csv_writer.print("\r\n");
             csv_writer.close();
 
-            tvFilePathName.setText("File path : /mnt/sdcard/Download/" + formatDate + ".csv");
+            mtv_FilePathName.setText("File path : /mnt/sdcard/Download/" + formatDate + ".csv");
         }
         catch (Exception e){
             e.printStackTrace();

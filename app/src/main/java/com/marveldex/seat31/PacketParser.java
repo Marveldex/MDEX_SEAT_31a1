@@ -5,10 +5,6 @@ package com.marveldex.seat31;
  */
 
 
-import android.util.Log;
-
-import static android.os.SystemClock.elapsedRealtime;
-
 /**
  *
  * @details 압력세서로부터 전달 받은 데이터를 처리하여 직관적인 값으로 변환하고 사용할 변수에 Setting
@@ -23,6 +19,8 @@ import static android.os.SystemClock.elapsedRealtime;
 public class PacketParser {
     public static int def_PACKET_LENGTH = 20;
     public static byte m_BatteryLevel = 0;
+    public static byte m_Reserved = 0; // empty
+    public static byte m_HWState = 0; // 19th, 0 bit
     public static byte def_CELL_COUNT_ROW0 = 6;
     public static byte def_CELL_COUNT_ROW1 = 15;
     public static byte def_CELL_COUNT_ROW2 = 10;
@@ -43,12 +41,11 @@ public class PacketParser {
     public static boolean m_isPacketCompleted = false;
 
     private static int def_THRESHOLD_VALID_LOWEST = 5;
-    private static int def_THRESHOLD_VALUE_SEAT_OCCUPIED = 5;//200;
+    private static int def_THRESHOLD_VALUE_SEAT_OCCUPIED = 200;
+    private static int def_THRESHOLD_VALUE_ONE_LEG_EMPTY = 25;
 
     public static String textHexaMain = " ";
     public static String textHexaShield = " ";
-
-    int log_packet_x10_count = 0;
 
 
     public PacketParser(){
@@ -95,7 +92,6 @@ public class PacketParser {
 
             m_isPacketCompleted = false;
             Mode_Info = "M";
-
         }
         else if( packet_data_32bit[0] == 'S') {
             textHexaShield = String.format("Sh: %3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d,%3d",
@@ -105,7 +101,6 @@ public class PacketParser {
 
             m_isPacketCompleted = true;
             Mode_Info = "S";
-
 
         }else if(packet_data_32bit[0] == 'L') {
 
@@ -117,7 +112,6 @@ public class PacketParser {
 
             m_isPacketCompleted = false;
             Mode_Info = "L";
-            MainActivity.cnt_m++;
 
         }else if(packet_data_32bit[0] == 'R') {
 
@@ -128,7 +122,6 @@ public class PacketParser {
 
             m_isPacketCompleted = true;
             Mode_Info = "R";
-            MainActivity.cnt_s++;
 
         }
 
@@ -137,17 +130,14 @@ public class PacketParser {
             reorderSensorSequence();
         }
 
-        if(elapsedRealtime() - MainActivity.time_start >10000){
-            MainActivity.cnt_m++;
-            MainActivity.cnt_s++;
-            Log.i("Sample rate", "[" + log_packet_x10_count + "] " + "packet count/10sec = " + MainActivity.cnt_m);
-            MainActivity.time_start = elapsedRealtime();
-            log_packet_x10_count++;
-
-        }
-
 //      parse battery level
         m_BatteryLevel = packet_data_32bit[17];
+
+        //  18th : Empty, reserved
+        m_Reserved = packet_data_32bit[18];
+
+        //  19th (Last) : Venus Hardware setting. i.e. dip switch setting
+        m_HWState = packet_data_32bit[19];
 
     }
 
@@ -250,6 +240,38 @@ public class PacketParser {
     }
 
 
+    public static boolean isPacketCompleted(){
+        return m_isPacketCompleted;
+    }
+
+    public static byte getBatteryLevel(){
+        return m_BatteryLevel;
+    }
+
+    public static boolean getHW_DIPSW_state(int dipsw_index) {
+        //  valid dipsw_index value is 0, 1, 2 only.
+        if( (dipsw_index < 0) || (2 < dipsw_index) ) {
+            return false;
+        }
+
+        boolean ret_val = false;
+        //  Venus source code...
+        // g_ucNUS_PacketBuffer[19] = (g_DIPSWITCH_state[0] << 7) | (g_DIPSWITCH_state[1] << 6) | (g_DIPSWITCH_state[2] << 5);
+        switch (dipsw_index) {
+            case 0: // 0b1000000 = 0x80
+                ret_val = ( ((m_HWState & 0x80) >> 7) == 0x01);
+                break;
+            case 1:
+                ret_val = ( ((m_HWState & 0x40) >> 6) == 0x01);
+                break;
+            case 2:
+                ret_val = ( ((m_HWState & 0x20) >> 5) == 0x01);
+                break;
+        }
+
+        return ret_val;
+    }
+
     /**
      *
      * @brief calculate lateral COM
@@ -292,12 +314,12 @@ public class PacketParser {
 
     public static float getLateralCOC_right_Row1() {
         int cell_index = 0;
-        for(cell_index = (def_CELL_COUNT_ROW1 - 1) ; 0 < cell_index ; cell_index--) {
+        for(cell_index = (def_CELL_COUNT_ROW1 - 1) ; 0 <= cell_index ; cell_index--) {
             if(def_THRESHOLD_VALID_LOWEST < nPressureValue_Row1[cell_index]) {
                 break;
             }
         }
-        if(cell_index == -1)
+        if(cell_index == 0)
             cell_index = def_CELL_COUNT_ROW1 - 1;
 
         float coord_right = (float)cell_index - 7.0F; // 7.0F is center point of row 1
@@ -306,12 +328,110 @@ public class PacketParser {
         return coord_right;
     }
 
-    public static boolean isPacketCompleted(){
-        return m_isPacketCompleted;
+    //-------------------------------------------------------------------------
+    //  Posture determination
+    //-------------------------------------------------------------------------
+    public static int getLeftLegPressureSum() {
+        int sum_value_left = 0;
+
+        //  left : 0~2 cells of row 0
+        for(int cell_index = 0 ; cell_index <= 2 ; cell_index++) {
+            sum_value_left += nPressureValue_Row0 [cell_index];
+        }
+        return sum_value_left;
     }
 
-    public static byte getBatteryLevel(){
-        return m_BatteryLevel;
+    public static int getRightLegPressureSum() {
+        int sum_value_right = 0;
+
+        //  right : 3~5 cells of row 0
+        for(int cell_index = 3 ; cell_index <= 5 ; cell_index++) {
+            sum_value_right += nPressureValue_Row0 [cell_index];
+        }
+        return sum_value_right;
     }
+
+    public static boolean isLeftLeg_StuckOnChair() {
+        if(isSeatOccupied() == false)
+            return false;
+
+        if( def_THRESHOLD_VALUE_ONE_LEG_EMPTY < getLeftLegPressureSum() ){
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isRightLeg_StuckOnChair() {
+        if(isSeatOccupied() == false)
+            return false;
+
+        if( def_THRESHOLD_VALUE_ONE_LEG_EMPTY < getRightLegPressureSum() ){
+            return true;
+        }
+
+        return false;
+    }
+
+    public static float getLongitudinalVector(){
+        final float def_WEIGHT_FRONT = 1.2f; // front cell has more weight. Distance from row0 to row1 is further than distance from row1 to row2. row1 is center.
+        int cell_value = 0;
+
+        //  average of front : row 0
+        int cell_valid_count_front = 0;
+        int sum_value_front = 0;
+        float average_front = 0.0f;
+
+        for(int cell_index = 0 ; cell_index < def_CELL_COUNT_ROW0 ; cell_index++) {
+            cell_value = nPressureValue_Row0 [cell_index];
+            sum_value_front += cell_value;
+
+            if(def_THRESHOLD_VALID_LOWEST < cell_value) {
+                cell_valid_count_front++;
+            }
+        }
+
+        if( 0 < cell_valid_count_front) {
+            average_front = sum_value_front / cell_valid_count_front;
+        }
+
+        average_front *= def_WEIGHT_FRONT;
+
+        //  average of back : row 2
+        int cell_valid_count_back = 0;
+        int sum_value_back = 0;
+        float average_back= 0.0f;
+
+        for(int cell_index = 0 ; cell_index < def_CELL_COUNT_ROW2 ; cell_index++) {
+            cell_value = nPressureValue_Row2 [cell_index];
+            sum_value_back += cell_value;
+
+            if(def_THRESHOLD_VALID_LOWEST < cell_value) {
+                cell_valid_count_back++;
+            }
+        }
+
+        if( 0 < cell_valid_count_back) {
+            average_back = sum_value_back / cell_valid_count_back;
+        }
+
+        //  calculate logitudinal vector
+        float longitudinal_vector = ( ( average_front * -1) + (average_back * 1 ) ) / (average_front + average_back); // -1 and 1 is y coordnate of row0(front) and row2(back).
+
+        return longitudinal_vector;
+    }
+
+    public static float getLateralVector() {
+        float center_of_mess = getLateralCOM_Row1();
+        float left_of_contour = getLateralCOC_left_Row1();
+        float right_of_contour = getLateralCOC_right_Row1();
+
+        float center_of_heap = (left_of_contour + right_of_contour) / 2;
+
+        float lateral_vector = center_of_mess - center_of_heap;
+
+        return lateral_vector;
+    }
+
 
 }
