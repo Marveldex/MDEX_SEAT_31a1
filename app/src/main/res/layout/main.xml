@@ -8,7 +8,7 @@
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="vertical" >
 
         <Button
             android:id="@+id/btn_select"
@@ -16,6 +16,44 @@
             android:layout_height="wrap_content"
             android:padding="12dp"
             android:text="@string/ui_connect" />
+
+        <RelativeLayout
+            android:id="@+id/LL_BLIND_TIME_AREA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/whitegrey"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/LL_BATTERY_INFO"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/TV_BLIND_STATE"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignParentLeft="true"
+                android:maxLength="120"
+                android:text=""
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/TV_BLIND_TIME_START"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_centerHorizontal="true"
+                android:maxLength="120"
+                android:text=""
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/TV_BLIND_TIME_ELAPSED"
+                android:layout_alignParentEnd="true"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:maxLength="120"
+                android:text=""
+                android:textSize="14dp" />
+        </RelativeLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -35,7 +73,7 @@
             <TextView
                 android:id="@+id/TV_BatteryLevel"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:maxLength="120"
@@ -45,7 +83,7 @@
             <TextView
                 android:id="@+id/TV_CurTime"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:maxLength="120"
@@ -285,7 +323,7 @@
             <Space
                 android:id="@+id/Mid_Space2"
                 android:layout_width="match_parent"
-                android:layout_height="5dp"
+                android:layout_height="15dp"
                 android:layout_below="@+id/LL_CHAIR_CELL_ARRAY"
                 android:layout_toEndOf="@+id/sendText"
                 android:layout_marginStart="12dp" />
@@ -364,26 +402,16 @@
             <Space
                 android:id="@+id/Mid_Space"
                 android:layout_width="match_parent"
-                android:layout_height="10dp"
+                android:layout_height="15dp"
                 android:layout_below="@+id/RelativeLayout_COM" />
-
-            <Button
-                android:id="@+id/BTN_Expl_Hide"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Mid_Space"
-                android:layout_centerInParent="true"
-                android:text="SHOW" />
 
             <ListView
                 android:id="@+id/TV_SEAT_LOG"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="150dp"
+                android:layout_below="@+id/Mid_Space"
                 android:textColor="@color/whitegrey"
-                android:textSize="7px"
-                android:visibility="gone"
-                android:layout_below="@+id/BTN_Expl_Hide"
-                android:layout_alignParentStart="true" />
+                android:textSize="7px" />
 
             <TextView
                 android:id="@+id/MODE_INFO"
@@ -396,20 +424,49 @@
             <Space
                 android:id="@+id/Mid_Space3"
                 android:layout_width="match_parent"
-                android:layout_height="5dp"
+                android:layout_height="15dp"
                 android:layout_below="@+id/TV_SEAT_LOG"
                 android:layout_alignParentStart="true" />
+
+            <LinearLayout
+                android:id="@+id/LL_POSTURE_MSG"
+                android:layout_below="@+id/TV_SEAT_LOG"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/TV_LEFT_LEG_CROSSED"
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:text="left leg : off"/>
+                <TextView
+                    android:id="@+id/TV_RIGHT_LEG_CROSSED"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="right leg : off"/>
+                <TextView
+                    android:id="@+id/TV_LONGITUDINAL_VECTOR"
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"
+                    android:text=" longitudinal : 0.00"/>
+                <TextView
+                    android:id="@+id/TV_LATERAL_VECTOR"
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:text=" lateral : 0.00"/>
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/TV_POSTURE_LATERAL"
                 android:layout_width="match_parent"
-                android:layout_height="15dp"
+                android:layout_height="20dp"
                 android:layout_below="@+id/MODE_INFO"
                 android:background="@drawable/background_posture"
                 android:gravity="center"
                 android:text="@string/ui_posture_lateral"
                 android:textColor="@color/yellow"
-                android:textSize="13sp" />
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/TV_POSTURE_LONGITUDINAL"

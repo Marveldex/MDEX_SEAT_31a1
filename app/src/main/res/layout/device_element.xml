@@ -33,18 +33,38 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/LL_rssi"
         android:text="@string/paired"
         android:textSize="12dp" />
 
-    <TextView
-        android:id="@+id/rssi"
+    <LinearLayout
+        android:id="@+id/LL_rssi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_below="@+id/paired"
-        android:textSize="12dp" />
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true">
+
+        <TextView
+            android:id="@+id/lastdevice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="last"
+            android:textSize="10dp" />
+
+        <TextView
+            android:id="@+id/rssi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="rssi"
+            android:textSize="12dp" />
+
+    </LinearLayout>
+
+
 
     <TextView
         android:id="@+id/name"
